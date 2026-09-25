@@ -1,0 +1,144 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.login-page {
+  min-height: 100vh;
+  width: 100%;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  transition: background-image 1s ease-in-out;
+  font-family: Arial, sans-serif;
+}
+
+.login-container {
+
+  width: 420px;
+
+  padding: 40px;
+
+  border-radius: 20px;
+
+
+  /* Glass effect */
+  background: rgba(255, 255, 255, 0.25);
+
+  backdrop-filter: blur(15px);
+
+  -webkit-backdrop-filter: blur(15px);
+
+
+  border: 1px solid rgba(255, 255, 255, 0.4);
+
+
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.25);
+
+
+  position: relative;
+
+  z-index: 2;
+
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.login-header h1 {
+  font-size: 30px;
+  color: #2563eb;
+  margin-bottom: 8px;
+}
+
+.login-header p {
+  color: #071430;
+  font-size: 14px;
+}
+
+.login-form h2 {
+  text-align: center;
+  font-size: 25px;
+  color: #111827;
+  margin-bottom: 8px;
+}
+
+.login-subtitle {
+  text-align: center;
+  color: #04080f;
+  margin-bottom: 25px;
+}
+
+.login-form label {
+  display: block;
+  margin-bottom: 7px;
+  color: #071430;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.login-form input {
+
+  width: 100%;
+  padding: 13px;
+  margin-bottom: 18px;
+  background: rgba(255,255,255,0.7);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+}
+
+.login-form input:focus {
+  border-color: #2563eb;
+}
+
+.forgot-password {
+  text-align: right;
+  margin-bottom: 20px;
+}
+
+.forgot-password a {
+  color: #071430;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.login-button {
+  width: 100%;
+  padding: 13px;
+  border: none;
+  border-radius: 7px;
+  background: #2563eb;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.login-button:hover {
+  background: #1d4ed8;
+}
+
+.register-text {
+  text-align: center;
+  margin-top: 22px;
+  color: #0a0a0b;
+  font-size: 14px;
+}
+
+.register-text a {
+  color: #071430;
+  text-decoration: none;
+  font-weight: 600;
+}
