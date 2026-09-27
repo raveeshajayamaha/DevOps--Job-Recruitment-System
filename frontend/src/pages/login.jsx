@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import "./login.css";
 
 function Login() {
@@ -176,16 +177,15 @@ function Login() {
 
 
 
+<p className="register-text">
 
-          <p className="register-text">
+  Don't have an account?
 
-            Don't have an account?
+  <Link to="/register">
+    Register
+  </Link>
 
-            <a href="#">
-              Register
-            </a>
-
-          </p>
+</p>
 
 
 
