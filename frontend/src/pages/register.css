@@ -10,6 +10,7 @@
 /* ============================= */
 
 .register-page {
+
   min-height: 100vh;
   width: 100%;
 
@@ -18,14 +19,14 @@
   align-items: center;
 
   background-size: cover;
-  background-position: center;
+  background-position: center right;
   background-repeat: no-repeat;
-
-  transition: background-image 1s ease-in-out;
 
   font-family: Arial, sans-serif;
 
-  padding: 30px 20px;
+  padding: 40px 20px;
+
+  overflow-y: auto;
 }
 
 
@@ -34,6 +35,7 @@
 /* ============================= */
 
 .register-container {
+
   width: 450px;
   max-width: 100%;
 
@@ -41,17 +43,20 @@
 
   border-radius: 20px;
 
-  /* Glassmorphism */
-  background: rgba(255, 255, 255, 0.25);
+
+  /* Improved Glass Effect */
+  background: rgba(255, 255, 255, 0.55);
 
   backdrop-filter: blur(15px);
-
   -webkit-backdrop-filter: blur(15px);
 
-  border: 1px solid rgba(255, 255, 255, 0.4);
+
+  border: 1px solid rgba(255,255,255,0.5);
+
 
   box-shadow:
-    0 8px 32px rgba(0, 0, 0, 0.25);
+    0 8px 32px rgba(0,0,0,0.25);
+
 
   position: relative;
 
@@ -59,399 +64,512 @@
 }
 
 
+
 /* ============================= */
 /* Header */
 /* ============================= */
 
 .register-header {
+
   text-align: center;
 
   margin-bottom: 25px;
+
 }
 
+
 .register-header h1 {
-  font-size: 30px;
+
+  font-size: 32px;
 
   color: #2563eb;
 
+  font-weight: 700;
+
   margin-bottom: 8px;
+
 }
+
 
 .register-header p {
-  color: #071430;
 
-  font-size: 14px;
+  color: #111827;
 
-  line-height: 1.5;
+  font-size: 15px;
+
+  font-weight: 600;
+
 }
+
 
 
 /* ============================= */
 /* Form Heading */
 /* ============================= */
 
+
 .register-form h2 {
+
   text-align: center;
 
-  font-size: 25px;
+  font-size: 26px;
 
-  color: #111827;
+  color: #0f172a;
+
+  font-weight: 700;
 
   margin-bottom: 8px;
+
 }
 
+
+
 .register-subtitle {
+
   text-align: center;
 
-  color: #04080f;
+  color: #1e293b;
+
+  font-size: 15px;
+
+  font-weight: 500;
 
   margin-bottom: 22px;
 
-  font-size: 15px;
 }
+
 
 
 /* ============================= */
 /* Labels */
 /* ============================= */
 
+
 .register-form label {
+
   display: block;
 
   margin-bottom: 7px;
 
-  color: #071430;
+  color: #0f172a;
 
-  font-size: 14px;
+  font-size: 15px;
 
-  font-weight: 600;
+  font-weight: 700;
+
 }
 
 
+
 /* ============================= */
-/* First Name + Last Name */
+/* Name Row */
 /* ============================= */
 
+
 .name-row {
+
   display: flex;
 
   gap: 14px;
 
   width: 100%;
 
-  margin-bottom: 0;
 }
+
 
 .name-field {
+
   flex: 1;
 
-  min-width: 0;
 }
 
+
 .name-field input {
+
   width: 100%;
+
 }
+
 
 
 /* ============================= */
 /* Input + Select */
 /* ============================= */
 
+
 .register-form input,
 .register-form select {
+
+
   width: 100%;
+
 
   padding: 13px;
 
+
   margin-bottom: 16px;
 
-  background: rgba(255, 255, 255, 0.88);
 
-  border: 1px solid rgba(255, 255, 255, 0.75);
+  background: rgba(255,255,255,0.92);
+
+
+  border: 1px solid rgba(255,255,255,0.8);
+
 
   border-radius: 8px;
 
-  font-size: 14px;
 
-  color: #071430;
+  font-size: 15px;
+
+
+  color: #0f172a;
+
+
+  font-weight: 500;
+
 
   outline: none;
 
+
   transition:
-    border-color 0.2s ease,
-    background 0.2s ease,
-    box-shadow 0.2s ease;
+  border-color .2s ease,
+  background .2s ease,
+  box-shadow .2s ease;
+
 }
 
 
-/* ============================= */
-/* Input Focus */
-/* ============================= */
+
+.register-form input::placeholder {
+
+  color:#64748b;
+
+  opacity:1;
+
+}
+
+
 
 .register-form input:focus,
 .register-form select:focus {
-  border-color: #2563eb;
 
-  background: rgba(255, 255, 255, 0.95);
+
+  border-color:#2563eb;
+
+
+  background:white;
+
 
   box-shadow:
-    0 0 0 2px rgba(37, 99, 235, 0.15);
+
+  0 0 0 3px rgba(37,99,235,0.15);
+
 }
+
 
 
 /* ============================= */
 /* Select */
 /* ============================= */
 
+
 .register-form select {
-  cursor: pointer;
 
-  color: #071430;
+  cursor:pointer;
 
-  font-weight: 500;
 }
+
+
 
 .register-form select option {
-  background: #ffffff;
 
-  color: #071430;
+  background:white;
 
-  font-size: 14px;
+  color:#0f172a;
+
 }
+
 
 
 /* ============================= */
 /* Register Button */
 /* ============================= */
 
+
 .register-button {
-  width: 100%;
 
-  padding: 13px;
 
-  margin-top: 5px;
+  width:100%;
 
-  border: none;
 
-  border-radius: 7px;
+  padding:13px;
 
-  background: #2563eb;
 
-  color: white;
+  margin-top:5px;
 
-  font-size: 16px;
 
-  font-weight: 600;
+  border:none;
 
-  cursor: pointer;
 
-  transition:
-    background 0.2s ease,
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
+  border-radius:8px;
+
+
+  background:#2563eb;
+
+
+  color:white;
+
+
+  font-size:16px;
+
+
+  font-weight:700;
+
+
+  cursor:pointer;
+
+
+  transition:.2s ease;
+
 }
 
 
-/* Button Hover */
 
 .register-button:hover {
-  background: #1d4ed8;
 
-  transform: translateY(-1px);
+
+  background:#1d4ed8;
+
+
+  transform:translateY(-1px);
+
 
   box-shadow:
-    0 5px 15px rgba(37, 99, 235, 0.3);
+
+  0 5px 15px rgba(37,99,235,.3);
+
 }
 
 
-/* Button Click */
 
 .register-button:active {
-  transform: translateY(0);
+
+  transform:translateY(0);
+
 }
+
 
 
 /* ============================= */
 /* Login Text */
 /* ============================= */
 
+
 .login-text {
-  text-align: center;
 
-  margin-top: 20px;
 
-  color: #0a0a0b;
+  text-align:center;
 
-  font-size: 14px;
 
-  line-height: 1.5;
+  margin-top:20px;
+
+
+  color:#0f172a;
+
+
+  font-size:14px;
+
+
+  font-weight:500;
+
+
 }
+
+
 
 .login-text a {
-  margin-left: 5px;
 
-  color: #071430;
 
-  text-decoration: none;
+  margin-left:5px;
 
-  font-weight: 600;
 
-  transition: color 0.2s ease;
+  color:#2563eb;
+
+
+  text-decoration:none;
+
+
+  font-weight:700;
+
+
 }
+
+
 
 .login-text a:hover {
-  color: #2563eb;
 
-  text-decoration: underline;
+
+  text-decoration:underline;
+
 }
 
 
+
 /* ============================= */
-/* Tablet Responsive */
+/* Tablet */
 /* ============================= */
 
-@media (max-width: 768px) {
 
-  .register-page {
-    padding: 25px 18px;
-  }
+@media(max-width:768px){
 
-  .register-container {
-    width: 100%;
 
-    max-width: 450px;
+.register-container{
 
-    padding: 32px 30px;
 
-    border-radius: 18px;
-  }
+width:100%;
 
-  .register-header h1 {
-    font-size: 28px;
-  }
 
-  .register-form h2 {
-    font-size: 24px;
-  }
+max-width:450px;
+
+
+padding:32px 30px;
+
+
 }
 
 
-/* ============================= */
-/* Mobile Responsive */
-/* ============================= */
-
-@media (max-width: 600px) {
-
-  .register-page {
-    min-height: 100vh;
-
-    padding: 20px 14px;
-
-    align-items: center;
-  }
-
-  .register-container {
-    width: 100%;
-
-    max-width: 420px;
-
-    padding: 28px 22px;
-
-    border-radius: 16px;
-  }
-
-  .register-header {
-    margin-bottom: 20px;
-  }
-
-  .register-header h1 {
-    font-size: 26px;
-  }
-
-  .register-header p {
-    font-size: 13px;
-  }
-
-  .register-form h2 {
-    font-size: 22px;
-  }
-
-  .register-subtitle {
-    font-size: 14px;
-
-    margin-bottom: 20px;
-  }
-
-  /* Stack First Name + Last Name */
-  .name-row {
-    flex-direction: column;
-
-    gap: 0;
-  }
-
-  .name-field {
-    width: 100%;
-  }
-
-  .register-form input,
-  .register-form select {
-    padding: 12px;
-
-    font-size: 14px;
-  }
-
-  .register-form label {
-    font-size: 13px;
-  }
-
-  .register-button {
-    padding: 12px;
-
-    font-size: 15px;
-  }
-
-  .login-text {
-    font-size: 13px;
-
-    margin-top: 18px;
-  }
 }
 
 
+
 /* ============================= */
-/* Small Mobile Devices */
+/* Mobile */
 /* ============================= */
 
-@media (max-width: 380px) {
 
-  .register-page {
-    padding: 15px 10px;
-  }
+@media(max-width:600px){
 
-  .register-container {
-    padding: 24px 18px;
 
-    border-radius: 14px;
-  }
+.register-page{
 
-  .register-header h1 {
-    font-size: 24px;
-  }
 
-  .register-form h2 {
-    font-size: 20px;
-  }
+padding:20px 15px;
 
-  .register-form input,
-  .register-form select {
-    padding: 11px;
 
-    font-size: 13px;
-  }
+}
 
-  .register-button {
-    padding: 11px;
 
-    font-size: 14px;
-  }
+
+.register-container{
+
+
+padding:28px 22px;
+
+
+}
+
+
+
+.name-row{
+
+
+flex-direction:column;
+
+
+gap:0;
+
+
+}
+
+
+
+.register-header h1{
+
+font-size:26px;
+
+}
+
+
+
+.register-form h2{
+
+font-size:22px;
+
+}
+
+
+
+.register-form input,
+.register-form select{
+
+padding:12px;
+
+font-size:14px;
+
+}
+
+
+
+}
+
+
+
+/* ============================= */
+/* Small Mobile */
+/* ============================= */
+
+
+@media(max-width:380px){
+
+
+.register-container{
+
+
+padding:24px 18px;
+
+
+}
+
+
+
+.register-header h1{
+
+font-size:24px;
+
+}
+
+
+
+.register-form h2{
+
+font-size:20px;
+
+}
+
+
+.register-button{
+
+font-size:14px;
+
+}
+
+.register-page::before {
+
+  content: "";
+
+  position: absolute;
+
+  top:0;
+  left:0;
+
+  width:100%;
+  height:100%;
+
+  background: rgba(0,0,0,0.35);
+
+  z-index:1;
+
+}
+
+
 }

@@ -1,17 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import "./register.css";
 
 function Register() {
   const backgrounds = [
-    "/background/bg1.png",
-    "/background/bg2.jpg",
-    "/background/bg3.jpg",
-    "/background/bg4.jpg",
-    "/background/bg5.jpg"
+    "/background/bg1.png"
+  
   ];
 
-  const [currentBackground, setCurrentBackground] = useState(0);
 
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -20,16 +16,6 @@ function Register() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [role, setRole] = useState("candidate");
 
-  // Change background every 5 seconds
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentBackground(
-        (previous) => (previous + 1) % backgrounds.length
-      );
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, []);
 
   const handleRegister = (e) => {
     e.preventDefault();
@@ -74,11 +60,11 @@ function Register() {
 
   return (
     <div
-      className="register-page"
-      style={{
-        backgroundImage: `url(${backgrounds[currentBackground]})`
-      }}
-    >
+  className="register-page"
+  style={{
+    backgroundImage: "url('/background/bg_register1.avif')"
+  }}
+>
       <div className="register-container">
 
         {/* Header */}
