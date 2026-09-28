@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./login.css";
 
 function Login() {
+  const navigate = useNavigate();
 
   const backgrounds = [
     "/background/bg1.png",
@@ -17,7 +18,7 @@ function Login() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
+ 
 
   // Change background every 1 minute
   useEffect(() => {
@@ -58,7 +59,8 @@ function Login() {
     }
 
 
-    alert("Login form submitted successfully!");
+    alert("Login successful!");
+     navigate("/home");
 
 
     console.log("Email:", email);
