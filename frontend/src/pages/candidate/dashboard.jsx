@@ -1,13 +1,15 @@
 import { NavLink } from "react-router-dom";
 import "./dashboard.css";
 
+import jobs from "../../data/jobs";
+
 function Dashboard() {
   return (
     <div className="candidate-dashboard">
 
-      {/* ========================= */}
-      {/* Sidebar */}
-      {/* ========================= */}
+      {/* =========================
+          Sidebar
+      ========================= */}
 
       <aside className="dashboard-sidebar">
 
@@ -16,8 +18,8 @@ function Dashboard() {
           <span>Candidate Portal</span>
         </div>
 
-
         {/* Navigation */}
+
         <nav className="sidebar-navigation">
 
           <NavLink
@@ -32,7 +34,6 @@ function Dashboard() {
             Dashboard
           </NavLink>
 
-
           <NavLink
             to="/candidate/jobs"
             className="sidebar-link"
@@ -40,7 +41,6 @@ function Dashboard() {
             <span className="nav-icon">▣</span>
             Find Jobs
           </NavLink>
-
 
           <NavLink
             to="/candidate/applications"
@@ -50,7 +50,6 @@ function Dashboard() {
             My Applications
           </NavLink>
 
-
           <NavLink
             to="/candidate/interviews"
             className="sidebar-link"
@@ -58,7 +57,6 @@ function Dashboard() {
             <span className="nav-icon">◷</span>
             Interviews
           </NavLink>
-
 
           <NavLink
             to="/candidate/profile"
@@ -69,7 +67,6 @@ function Dashboard() {
           </NavLink>
 
         </nav>
-
 
         {/* Sidebar Bottom */}
 
@@ -88,9 +85,9 @@ function Dashboard() {
       </aside>
 
 
-      {/* ========================= */}
-      {/* Main Content */}
-      {/* ========================= */}
+      {/* =========================
+          Main Content
+      ========================= */}
 
       <main className="dashboard-main">
 
@@ -102,14 +99,12 @@ function Dashboard() {
             <h2>JobRecruit</h2>
           </div>
 
-
           <div className="header-right">
 
             <button className="notification-button">
               ♢
               <span className="notification-dot"></span>
             </button>
-
 
             <div className="profile-mini">
 
@@ -129,11 +124,12 @@ function Dashboard() {
         </header>
 
 
-        {/* ========================= */}
-        {/* Dashboard Content */}
-        {/* ========================= */}
+        {/* =========================
+            Dashboard Content
+        ========================= */}
 
         <section className="dashboard-content">
+
 
           {/* Welcome Section */}
 
@@ -156,7 +152,6 @@ function Dashboard() {
 
             </div>
 
-
             <NavLink
               to="/candidate/jobs"
               className="browse-jobs-button"
@@ -167,9 +162,9 @@ function Dashboard() {
           </div>
 
 
-          {/* ========================= */}
-          {/* Statistics */}
-          {/* ========================= */}
+          {/* =========================
+              Statistics
+          ========================= */}
 
           <div className="stats-grid">
 
@@ -181,7 +176,10 @@ function Dashboard() {
 
               <div>
                 <span>Available Jobs</span>
-                <strong>24</strong>
+
+                <strong>
+                  {jobs.length}
+                </strong>
               </div>
 
             </div>
@@ -195,6 +193,7 @@ function Dashboard() {
 
               <div>
                 <span>Applications</span>
+
                 <strong>5</strong>
               </div>
 
@@ -209,6 +208,7 @@ function Dashboard() {
 
               <div>
                 <span>Upcoming Interviews</span>
+
                 <strong>2</strong>
               </div>
 
@@ -217,9 +217,9 @@ function Dashboard() {
           </div>
 
 
-          {/* ========================= */}
-          {/* Recommended Jobs */}
-          {/* ========================= */}
+          {/* =========================
+              Recommended Jobs
+          ========================= */}
 
           <section className="jobs-section">
 
@@ -227,7 +227,9 @@ function Dashboard() {
 
               <div>
 
-                <h2>Recommended Jobs</h2>
+                <h2>
+                  Recommended Jobs
+                </h2>
 
                 <p>
                   Opportunities that may match your profile
@@ -245,155 +247,72 @@ function Dashboard() {
             </div>
 
 
-            {/* Job Card 1 */}
+            {/* Dynamic Job Cards */}
 
-            <div className="job-card">
+            {jobs.slice(0, 3).map((job, index) => (
 
-              <div className="company-logo">
-                T
-              </div>
+              <div
+                className="job-card"
+                key={job.id ?? index}
+              >
+
+                {/* Company Logo */}
+
+                <div className="company-logo">
+                  {job.company?.charAt(0) || job.title?.charAt(0)}
+                </div>
 
 
-              <div className="job-details">
+                {/* Job Details */}
 
-                <h3>
-                  Frontend Developer
-                </h3>
+                <div className="job-details">
 
-                <p className="company-name">
-                  Tech Solutions Ltd.
-                </p>
+                  <h3>
+                    {job.title}
+                  </h3>
 
-                <div className="job-meta">
+                  <p className="company-name">
+                    {job.company}
+                  </p>
 
-                  <span>
-                    📍 Colombo
-                  </span>
+                  <div className="job-meta">
 
-                  <span>
-                    💼 Full Time
-                  </span>
+                    <span>
+                      📍 {job.location}
+                    </span>
 
-                  <span>
-                    💰 Rs. 120K - 180K
-                  </span>
+                    <span>
+                      💼 {job.type}
+                    </span>
+
+                    <span>
+                      💰 {job.salary}
+                    </span>
+
+                  </div>
 
                 </div>
 
-              </div>
 
+                {/* Dynamic View Job Button */}
 
-              <NavLink
-                to="/candidate/jobs"
-                className="job-view-button"
-              >
-                View Job
-              </NavLink>
-
-            </div>
-
-
-            {/* Job Card 2 */}
-
-            <div className="job-card">
-
-              <div className="company-logo">
-                S
-              </div>
-
-
-              <div className="job-details">
-
-                <h3>
-                  Software Engineer
-                </h3>
-
-                <p className="company-name">
-                  SoftDev Technologies
-                </p>
-
-                <div className="job-meta">
-
-                  <span>
-                    📍 Colombo
-                  </span>
-
-                  <span>
-                    💼 Hybrid
-                  </span>
-
-                  <span>
-                    💰 Rs. 150K - 220K
-                  </span>
-
-                </div>
+                <NavLink
+                  to={`/candidate/jobs/${job.id ?? index + 1}`}
+                  className="job-view-button"
+                >
+                  View Job
+                </NavLink>
 
               </div>
 
-
-              <NavLink
-                to="/candidate/jobs"
-                className="job-view-button"
-              >
-                View Job
-              </NavLink>
-
-            </div>
-
-
-            {/* Job Card 3 */}
-
-            <div className="job-card">
-
-              <div className="company-logo">
-                D
-              </div>
-
-
-              <div className="job-details">
-
-                <h3>
-                  Junior Backend Developer
-                </h3>
-
-                <p className="company-name">
-                  Digital Lanka
-                </p>
-
-                <div className="job-meta">
-
-                  <span>
-                    📍 Galle
-                  </span>
-
-                  <span>
-                    💼 Full Time
-                  </span>
-
-                  <span>
-                    💰 Rs. 100K - 150K
-                  </span>
-
-                </div>
-
-              </div>
-
-
-              <NavLink
-                to="/candidate/jobs"
-                className="job-view-button"
-              >
-                View Job
-              </NavLink>
-
-            </div>
+            ))}
 
           </section>
 
 
-          {/* ========================= */}
-          {/* Profile Completion */}
-          {/* ========================= */}
+          {/* =========================
+              Profile Completion
+          ========================= */}
 
           <section className="profile-card">
 
@@ -416,7 +335,6 @@ function Dashboard() {
 
               </div>
 
-
               <NavLink
                 to="/candidate/profile"
                 className="profile-button"
@@ -431,12 +349,15 @@ function Dashboard() {
 
               <div className="progress-header">
 
-                <span>Profile progress</span>
+                <span>
+                  Profile progress
+                </span>
 
-                <strong>65%</strong>
+                <strong>
+                  65%
+                </strong>
 
               </div>
-
 
               <div className="progress-bar">
 
