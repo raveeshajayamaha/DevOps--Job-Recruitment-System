@@ -1,298 +1,245 @@
-import "./home.css";
 import { useNavigate } from "react-router-dom";
+import "./Home.css";
 
 
-function Home() {
-
+function Home(){
   const navigate = useNavigate();
+    return(
 
+        <div className="home-page">
 
-  return (
 
-    <div className="home-page">
+            {/* Navigation Bar */}
 
+            <nav className="navbar">
 
-      {/* Navbar */}
 
-      <nav className="navbar">
+                <div className="logo">
 
-        <h2>
-          JobRecruit
-        </h2>
+                    👥 <span>JobRecruit</span>
 
+                </div>
 
-        <div className="nav-links">
 
-          <a href="#about">
-            About
-          </a>
 
-          <a href="#features">
-            Features
-          </a>
+                <div className="nav-links">
 
-          <a href="#jobs">
-            Jobs
-          </a>
+                    <a className="active">
+                        Home
+                    </a>
 
+                    <a>
+                        About
+                    </a>
 
-        <button>
-    Explore Dashboard
-       </button>
+                    <a>
+                        Jobs
+                    </a>
 
+                    <a>
+                        Companies
+                    </a>
 
-        </div>
+                    <a>
+                        Contact
+                    </a>
 
-      </nav>
+                </div>
 
 
 
-      {/* Hero Section */}
+                <div className="buttons">
 
-      <section className="hero">
+                    <button 
+                   className="login-btn"
+                   onClick={()=>navigate("/login")}
+>
+                     Login
+                    </button>
 
 
-<div className="hero-text">
+                   <button 
+                   className="register-btn"
+                onClick={()=>navigate("/register")}
+>
+                  Register
+                   </button>
 
-<h1>
-Find Your Dream Career
-</h1>
+                </div>
 
 
-<p>
-Connect with top companies and discover
-opportunities that match your skills.
-</p>
+            </nav>
 
 
-<button onClick={() => navigate("/dashboard")}>
-Explore Jobs
-</button>
 
 
-</div>
+            {/* Hero Section */}
 
 
+            <section className="hero">
 
-<div className="hero-image">
 
-<img 
-src="/images/bg_home.png"
-alt="Career"
-/>
+                <div className="hero-content">
 
-</div>
 
+                    <div className="line"></div>
 
-</section>
 
+                    <p className="small-text">
+                        YOUR NEXT OPPORTUNITY STARTS HERE
+                    </p>
 
 
 
-      {/* About */}
+                    <h1>
 
-      <section id="about" className="about">
+                        Find Your
+                        <br/>
 
+                        <span>
+                            Dream Job
+                        </span>
 
-        <h2>
-          About JobRecruit
-        </h2>
+                    </h1>
 
 
-        <p>
-          JobRecruit is a modern Job Recruitment and
-          Applicant Tracking System that connects
-          talented candidates with companies while
-          simplifying the recruitment process.
-        </p>
 
+                    <p className="description">
 
-      </section>
+                    Connect with top companies, explore exciting
+                    <br/>
+                    career opportunities, and build a brighter future.
 
+                    </p>
 
 
 
 
-      {/* Vision Mission */}
+                    {/* Search Bar */}
 
-      <section className="vision">
 
+                    <div className="search-box">
 
-        <div className="info-card">
 
-          <h2>
-            Our Vision
-          </h2>
+                        <div className="search-item">
 
-          <p>
-            To become a trusted digital platform
-            connecting talented individuals with
-            suitable career opportunities.
-          </p>
+                            🔍
+                            <span>
+                            Job title, keywords...
+                            </span>
 
-        </div>
+                        </div>
 
 
 
-        <div className="info-card">
+                        <div className="divider"></div>
 
-          <h2>
-            Our Mission
-          </h2>
 
-          <p>
-            To provide an efficient recruitment
-            platform that helps candidates and
-            companies achieve their goals.
-          </p>
 
-        </div>
+                        <div className="search-item">
 
+                            📍
+                            <span>
+                            Location
+                            </span>
 
-      </section>
+                        </div>
 
 
 
+                        <button>
+                            Search
+                        </button>
 
 
-      {/* Features */}
+                    </div>
 
-      <section id="features" className="features">
 
+                </div>
 
-        <h2>
-          Why Choose JobRecruit?
-        </h2>
 
+            </section>
 
-        <div className="feature-container">
 
 
-          <div className="feature-card">
 
-            <h3>
-              Smart Job Search
-            </h3>
 
-            <p>
-              Find opportunities matching your skills.
-            </p>
+            {/* Feature Cards */}
 
-          </div>
 
+            <div className="cards">
 
 
-          <div className="feature-card">
+                <div className="card">
 
-            <h3>
-              Easy Applications
-            </h3>
+                    <h3>
+                    💼 Wide Job Opportunities
+                    </h3>
 
-            <p>
-              Apply and track jobs easily.
-            </p>
+                    <p>
+                    Explore thousands of jobs
+                    from top companies.
+                    </p>
 
-          </div>
+                </div>
 
 
 
-          <div className="feature-card">
 
-            <h3>
-              Career Growth
-            </h3>
+                <div className="card">
 
-            <p>
-              Build your professional future.
-            </p>
+                    <h3>
+                    🏢 Top Companies
+                    </h3>
 
-          </div>
+                    <p>
+                    Discover trusted companies
+                    hiring talent like you.
+                    </p>
 
+                </div>
 
-        </div>
 
 
-      </section>
 
+                <div className="card">
 
+                    <h3>
+                    👥 Build Your Career
+                    </h3>
 
+                    <p>
+                    Get the tools and support
+                    to grow your career.
+                    </p>
 
+                </div>
 
-      {/* Featured Jobs */}
 
-      <section id="jobs" className="jobs">
 
 
-        <h2>
-          Featured Jobs
-        </h2>
+                <div className="card">
 
+                    <h3>
+                    📄 Easy Application
+                    </h3>
 
-        <div className="job-container">
+                    <p>
+                    Apply to multiple jobs
+                    with ease.
+                    </p>
 
+                </div>
 
-          <div className="job-card">
 
-            <h3>
-              Frontend Developer
-            </h3>
+            </div>
 
-            <p>
-              Tech Solutions Ltd
-            </p>
-
-          </div>
-
-
-
-          <div className="job-card">
-
-            <h3>
-              Software Engineer
-            </h3>
-
-            <p>
-              SoftDev Technologies
-            </p>
-
-          </div>
-
-
-
-          <div className="job-card">
-
-            <h3>
-              Backend Developer
-            </h3>
-
-            <p>
-              Digital Lanka
-            </p>
-
-          </div>
 
 
         </div>
 
 
-      </section>
-
-
-
-
-
-      <footer>
-
-        <p>
-          © 2026 JobRecruit
-        </p>
-
-      </footer>
-
-
-    </div>
-
-  );
+    )
 
 }
 
