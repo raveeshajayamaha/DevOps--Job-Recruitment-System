@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
+import Home from "./pages/home";
 import Login from "./pages/login";
 import Register from "./pages/register";
 
@@ -13,15 +14,19 @@ import ResumeBuilder from "./pages/candidate/resumeBuilder";
 import InterviewTips from "./pages/candidate/interviewTips";
 
 function App() {
-
   return (
     <BrowserRouter>
-
       <Routes>
+
+        {/* Home Page */}
+        <Route
+          path="/"
+          element={<Home />}
+        />
 
         {/* Login */}
         <Route
-          path="/"
+          path="/login"
           element={<Login />}
         />
 
@@ -49,37 +54,39 @@ function App() {
           element={<JobDetails />}
         />
 
-        {/* Candidate Application pages */}
+        {/* Candidate Applications */}
         <Route
           path="/candidate/applications"
           element={<Applications />}
         />
 
+        {/* Candidate Interviews */}
         <Route
           path="/candidate/interviews"
           element={<InterviewsPage />}
         />
 
+        {/* Career Resources */}
         <Route
           path="/candidate/resources"
           element={<ResourcesPage />}
         />
 
+        {/* Resume Builder */}
         <Route
           path="/candidate/resources/resume-builder"
           element={<ResumeBuilder />}
         />
 
+        {/* Interview Tips */}
         <Route
           path="/candidate/resources/interview-tips"
           element={<InterviewTips />}
         />
 
       </Routes>
-
     </BrowserRouter>
   );
 }
-
 
 export default App;
