@@ -1,16 +1,18 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { jobs } from "../../data/jobs";
 
 import "./findjobs.css";
 
 function FindJobs() {
-  const [search, setSearch] = useState("");
+  const [searchParams] = useSearchParams();
+  const querySearch = searchParams.get("search") || "";
+  const [search, setSearch] = useState(querySearch);
   const [location, setLocation] = useState("");
   const [jobType, setJobType] = useState("All Types");
 
   const filteredJobs = jobs.filter((job) => {
-    const searchText = search.toLowerCase();
+    const searchText = search.trim().toLowerCase();
 
     const matchesSearch =
       job.title.toLowerCase().includes(searchText) ||

@@ -1,8 +1,9 @@
 import { Link } from "react-router-dom";
+import "./resourcePages.css";
 
 function InterviewTips() {
   return (
-    <div style={{
+    <div className="resource-page" style={{
       minHeight: "100vh",
       background: "#eef3f9",
       padding: "32px 24px",

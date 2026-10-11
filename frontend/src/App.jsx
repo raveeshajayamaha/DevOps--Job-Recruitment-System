@@ -8,10 +8,25 @@ import Dashboard from "./pages/candidate/dashboard";
 import FindJobs from "./pages/candidate/findjobs";
 import JobDetails from "./pages/candidate/jobDetails";
 import Applications from "./pages/candidate/applications";
+import CandidateApplicationDetails from "./pages/candidate/applicationDetails";
 import InterviewsPage from "./pages/candidate/interviewsPage";
 import ResourcesPage from "./pages/candidate/resources";
 import ResumeBuilder from "./pages/candidate/resumeBuilder";
 import InterviewTips from "./pages/candidate/interviewTips";
+import Profile from "./pages/candidate/profile";
+import Settings from "./pages/candidate/settings";
+import RecruiterDashboard from "./pages/recruiter/dashboard";
+import RecruiterJobDetails from "./pages/recruiter/jobDetails";
+import EditJob from "./pages/recruiter/editJob";
+import RecruiterApplications from "./pages/recruiter/applications";
+import RecruiterApplicationDetails from "./pages/recruiter/applicationDetails";
+import RecruiterInterviews from "./pages/recruiter/interviews";
+import RecruiterInterviewDetails from "./pages/recruiter/interviewDetails";
+import ScheduleInterview from "./pages/recruiter/scheduleInterview";
+import ManageJobs from "./pages/recruiter/manageJobs";
+import PostJob from "./pages/recruiter/postJob";
+import RecruiterProfile from "./pages/recruiter/profile";
+import RecruiterSettings from "./pages/recruiter/settings";
 
 function App() {
   return (
@@ -54,10 +69,26 @@ function App() {
           element={<JobDetails />}
         />
 
+        {/* Candidate Profile */}
+        <Route
+          path="/candidate/profile"
+          element={<Profile />}
+        />
+
+        {/* Candidate Settings */}
+        <Route
+          path="/candidate/settings"
+          element={<Settings />}
+        />
+
         {/* Candidate Applications */}
         <Route
           path="/candidate/applications"
           element={<Applications />}
+        />
+        <Route
+          path="/candidate/applications/:applicationId"
+          element={<CandidateApplicationDetails />}
         />
 
         {/* Candidate Interviews */}
@@ -82,6 +113,78 @@ function App() {
         <Route
           path="/candidate/resources/interview-tips"
           element={<InterviewTips />}
+        />
+
+        {/* Recruiter Dashboard */}
+        <Route
+          path="/recruiter/dashboard"
+          element={<RecruiterDashboard />}
+        />
+
+        {/* Recruiter Post Job */}
+        <Route
+          path="/recruiter/jobs/new"
+          element={<PostJob />}
+        />
+
+        {/* Recruiter Job Details */}
+        <Route
+          path="/recruiter/jobs/:jobId"
+          element={<RecruiterJobDetails />}
+        />
+
+        {/* Recruiter Edit Job */}
+        <Route
+          path="/recruiter/jobs/:jobId/edit"
+          element={<EditJob />}
+        />
+
+        {/* Recruiter Manage Jobs */}
+        <Route
+          path="/recruiter/jobs"
+          element={<ManageJobs />}
+        />
+
+        {/* Recruiter Application Details */}
+        <Route
+          path="/recruiter/applications/:applicationId"
+          element={<RecruiterApplicationDetails />}
+        />
+
+        {/* Recruiter Applications */}
+        <Route
+          path="/recruiter/applications"
+          element={<RecruiterApplications />}
+        />
+
+        {/* Recruiter Interview Details */}
+        <Route
+          path="/recruiter/interviews/:interviewId"
+          element={<RecruiterInterviewDetails />}
+        />
+
+        {/* Recruiter Schedule Interview */}
+        <Route
+          path="/recruiter/interviews/schedule/:applicationId"
+          element={<ScheduleInterview />}
+        />
+
+        {/* Recruiter Interviews */}
+        <Route
+          path="/recruiter/interviews"
+          element={<RecruiterInterviews />}
+        />
+
+        {/* Recruiter Profile */}
+        <Route
+          path="/recruiter/profile"
+          element={<RecruiterProfile />}
+        />
+
+        {/* Recruiter Settings */}
+        <Route
+          path="/recruiter/settings"
+          element={<RecruiterSettings />}
         />
 
       </Routes>

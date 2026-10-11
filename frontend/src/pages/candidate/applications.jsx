@@ -1,132 +1,168 @@
+import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import CandidateLayout from "./candidateLayout";
 import applications from "../../data/applications";
+import "./applications.css";
+
+const statusOptions = ["All", "Pending", "Shortlisted", "Interview", "Rejected"];
+
+const statusClassNames = {
+  Pending: "pending",
+  Shortlisted: "shortlisted",
+  Interview: "interview",
+  Rejected: "rejected",
+};
 
 function Applications() {
+  const [statusFilter, setStatusFilter] = useState("All");
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const filteredApplications = useMemo(() => {
+    const normalizedSearch = searchTerm.trim().toLowerCase();
+
+    return applications.filter((application) => {
+      const matchesStatus =
+        statusFilter === "All" || application.status === statusFilter;
+      const matchesSearch =
+        !normalizedSearch ||
+        application.jobTitle.toLowerCase().includes(normalizedSearch) ||
+        application.company.toLowerCase().includes(normalizedSearch);
+
+      return matchesStatus && matchesSearch;
+    });
+  }, [searchTerm, statusFilter]);
+
+  const getStatusCount = (status) =>
+    applications.filter((application) => application.status === status).length;
+
   return (
-    <div style={{
-      minHeight: "100vh",
-      background: "#eef3f9",
-      padding: "32px 24px",
-      fontFamily: "Inter, 'Segoe UI', sans-serif",
-      color: "#0f172a"
-    }}>
-      <div style={{
-        maxWidth: "960px",
-        margin: "0 auto",
-        background: "#fff",
-        borderRadius: "18px",
-        border: "1px solid #e2e8f0",
-        boxShadow: "0 10px 28px rgba(15, 23, 42, 0.06)",
-        padding: "28px"
-      }}>
-        <div style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: "16px",
-          marginBottom: "24px"
-        }}>
-          <div>
-            <p style={{ margin: 0, color: "#1769e0", fontWeight: 700, fontSize: "12px", letterSpacing: "0.12em", textTransform: "uppercase" }}>
-              Candidate Portal
-            </p>
-            <h1 style={{ margin: "8px 0 0", fontSize: "32px" }}>
-              My Applications
-            </h1>
+    <CandidateLayout
+      title="Applications"
+      eyebrow="Candidate applications"
+    >
+      <div className="applications-page-content">
+        <p className="applications-subtitle">
+          Track the status of jobs you have applied for.
+        </p>
+
+        <section className="application-summary-grid" aria-label="Application summary">
+          <SummaryCard label="Total Applications" value={applications.length} />
+          <SummaryCard label="Pending" value={getStatusCount("Pending")} />
+          <SummaryCard label="Shortlisted" value={getStatusCount("Shortlisted")} />
+          <SummaryCard label="Interview" value={getStatusCount("Interview")} />
+          <SummaryCard label="Rejected" value={getStatusCount("Rejected")} />
+        </section>
+
+        <section className="candidate-card application-list-card">
+          <div className="applications-toolbar">
+            <div>
+              <h2>Application history</h2>
+              <p>{filteredApplications.length} application{filteredApplications.length === 1 ? "" : "s"} shown</p>
+            </div>
+
+            <div className="application-filters">
+              <label>
+                Search applications
+                <input
+                  type="search"
+                  placeholder="Job title or company"
+                  value={searchTerm}
+                  onChange={(event) => setSearchTerm(event.target.value)}
+                />
+              </label>
+              <label>
+                Status
+                <select
+                  value={statusFilter}
+                  onChange={(event) => setStatusFilter(event.target.value)}
+                >
+                  {statusOptions.map((status) => (
+                    <option key={status} value={status}>
+                      {status}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
           </div>
 
-          <Link
-            to="/candidate/dashboard"
-            style={{
-              padding: "10px 18px",
-              borderRadius: "10px",
-              background: "#1769e0",
-              color: "#fff",
-              textDecoration: "none",
-              fontWeight: 600
-            }}
-          >
-            Back to Dashboard
-          </Link>
+          {filteredApplications.length === 0 ? (
+            <div className="applications-empty-state">
+              <div className="empty-state-icon">📄</div>
+              <h3>No applications found.</h3>
+              <p>Try selecting a different status or search term.</p>
+            </div>
+          ) : (
+            <div className="application-list">
+              {filteredApplications.map((application) => (
+                <ApplicationCard
+                  application={application}
+                  key={application.id}
+                />
+              ))}
+            </div>
+          )}
+        </section>
+      </div>
+    </CandidateLayout>
+  );
+}
+
+function SummaryCard({ label, value }) {
+  return (
+    <div className="application-summary-card">
+      <span className="application-summary-value">{value}</span>
+      <span className="application-summary-label">{label}</span>
+    </div>
+  );
+}
+
+function ApplicationCard({ application }) {
+  const statusClassName = statusClassNames[application.status] || "pending";
+
+  return (
+    <article className="application-card">
+      <div className="application-company-logo">
+        {application.company.charAt(0).toUpperCase()}
+      </div>
+
+      <div className="application-card-details">
+        <div className="application-card-heading">
+          <div>
+            <h3>{application.jobTitle}</h3>
+            <p>{application.company}</p>
+          </div>
+          <span className={`application-status ${statusClassName}`}>
+            {application.status}
+          </span>
         </div>
 
-        {applications.length === 0 ? (
-          <div style={{
-            padding: "28px",
-            borderRadius: "16px",
-            background: "#f8fafc",
-            border: "1px solid #e2e8f0",
-            color: "#64748b"
-          }}>
-            No applications yet. Start applying to jobs to see them here.
-          </div>
-        ) : (
-          <div style={{ display: "grid", gap: "16px" }}>
-            {applications.map((application) => {
-              const statusStyle =
-                application.status === "Applied"
-                  ? { background: "#dcfce7", color: "#15803d" }
-                  : application.status === "Under Review"
-                    ? { background: "#dbeafe", color: "#2563eb" }
-                    : { background: "#fef3c7", color: "#b45309" };
+        <div className="application-meta">
+          <span>📍 {application.location}</span>
+          <span>💼 {application.jobType}</span>
+        </div>
 
-              return (
-                <div
-                  key={application.id}
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "48px minmax(0,1fr) auto",
-                    gap: "16px",
-                    alignItems: "center",
-                    padding: "18px 20px",
-                    borderRadius: "14px",
-                    background: "#f8fafc",
-                    border: "1px solid #e2e8f0"
-                  }}
-                >
-                  <div style={{
-                    width: "48px",
-                    height: "48px",
-                    borderRadius: "12px",
-                    background: "#e0ecff",
-                    color: "#1769e0",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontWeight: 700
-                  }}>
-                    {application.company.charAt(0).toUpperCase()}
-                  </div>
-
-                  <div>
-                    <h3 style={{ margin: "0 0 4px", fontSize: "18px" }}>{application.jobTitle}</h3>
-                    <p style={{ margin: 0, color: "#64748b" }}>{application.company}</p>
-                  </div>
-
-                  <div style={{ textAlign: "right" }}>
-                    <span
-                      style={{
-                        display: "inline-block",
-                        padding: "6px 10px",
-                        borderRadius: "999px",
-                        fontSize: "11px",
-                        fontWeight: 700,
-                        ...statusStyle
-                      }}
-                    >
-                      {application.status}
-                    </span>
-                    <div style={{ marginTop: "8px", color: "#64748b", fontSize: "12px" }}>
-                      {application.appliedDate}
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
+        <div className="application-dates">
+          <span><strong>Applied:</strong> {application.appliedDate}</span>
+          <span><strong>Last updated:</strong> {application.lastUpdated}</span>
+        </div>
       </div>
-    </div>
+
+      <div className="application-card-actions">
+        <Link
+          to={`/candidate/jobs/${application.jobId}`}
+          className="application-view-job"
+        >
+          View Job →
+        </Link>
+        <Link
+          to={`/candidate/applications/${application.id}`}
+          className="application-view-button"
+        >
+          View Application
+        </Link>
+      </div>
+    </article>
   );
 }
 

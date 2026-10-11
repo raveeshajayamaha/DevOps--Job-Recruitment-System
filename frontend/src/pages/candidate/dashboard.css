@@ -891,6 +891,8 @@
 .side-card-header h2 {
   margin: 0;
 
+  color: #0f172a;
+
   font-size: 18px;
 }
 
@@ -963,26 +965,28 @@
 
 
 .interview-info strong {
+  color: #0f172a;
+
   font-size: 13px;
 }
 
 
 .interview-info span {
-  color: #64748b;
+  color: #475569;
 
   font-size: 12px;
 }
 
 
 .interview-info small {
-  color: #7b879a;
+  color: #475569;
 
   font-size: 10px;
 }
 
 
 .item-arrow {
-  color: #64748b;
+  color: #475569;
 }
 
 
@@ -1041,6 +1045,8 @@
 
 
 .application-info strong {
+  color: #0f172a;
+
   font-size: 12px;
 
   white-space: nowrap;
@@ -1052,7 +1058,7 @@
 
 
 .application-info span {
-  color: #64748b;
+  color: #475569;
 
   font-size: 11px;
 }
@@ -1097,7 +1103,7 @@
 
 
 .application-status small {
-  color: #94a3b8;
+  color: #475569;
 
   font-size: 9px;
 }
@@ -1159,12 +1165,14 @@
 
 
 .resource-item strong {
+  color: #0f172a;
+
   font-size: 13px;
 }
 
 
 .resource-item span {
-  color: #64748b;
+  color: #475569;
 
   font-size: 11px;
 }

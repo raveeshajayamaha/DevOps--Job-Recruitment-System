@@ -33,6 +33,8 @@ function Login() {
 
   const [password, setPassword] = useState("");
 
+  const [role, setRole] = useState("candidate");
+
 
   // ==============================
   // Background Slideshow
@@ -99,11 +101,12 @@ function Login() {
     alert("Login successful!");
 
 
-    // ==================================
-    // Navigate to Candidate Dashboard
-    // ==================================
-
-    navigate("/candidate/dashboard");
+    // Navigate according to the temporary frontend-selected account type.
+    navigate(
+      role === "recruiter"
+        ? "/recruiter/dashboard"
+        : "/candidate/dashboard"
+    );
 
   };
 
@@ -208,6 +211,31 @@ function Login() {
               setPassword(e.target.value)
             }
           />
+
+
+          {/* ============================== */}
+          {/* Account Type */}
+          {/* ============================== */}
+
+          <label htmlFor="role">
+            Account Type
+          </label>
+
+          <select
+            id="role"
+            value={role}
+            onChange={(e) =>
+              setRole(e.target.value)
+            }
+          >
+            <option value="candidate">
+              Candidate
+            </option>
+
+            <option value="recruiter">
+              Recruiter
+            </option>
+          </select>
 
 
           {/* ============================== */}
