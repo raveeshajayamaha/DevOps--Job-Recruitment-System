@@ -554,7 +554,442 @@ The migration must not claim that integration is complete. It must add loading, 
 9. Timezone source when converting frontend local date/time inputs.
 10. Whether candidate-facing application creation and candidate authentication are in scope for a separate contract.
 
-## 12. Backend implementation checklist
+## 12. Candidate API Requirements
+
+### VERIFIED IN CURRENT CODE
+
+The Candidate frontend currently provides registration and login forms, public job search and details, application submission intent, application list/detail screens, an interview list, profile editing, candidate settings, and a resume replacement control. These screens currently use mock data or local state; none of the endpoints below currently exists.
+
+### PROPOSED API CONTRACT
+
+Candidate endpoints use the fixed `/api/v1` base path and the same opaque string IDs, success envelopes, error format, date rules, and lowercase API statuses defined earlier in this document. The numeric IDs in the current mock data are not API requirements. Candidate list endpoints use the pagination shape in section 5.1. A candidate is identified from the authenticated token; request bodies must not accept a client-supplied `candidateId` for ordinary candidate operations.
+
+Candidate authentication is required for profile, settings, resume, application, and interview endpoints. Public job browsing and job details do not require authentication. A candidate may read or mutate only their own profile, settings, resume, applications, and interviews. The backend must return `401` for missing/invalid authentication, `403` for an authenticated caller without the required permission, and `404` when a requested protected resource is not in the caller's visible scope. These are proposed requirements, not claims that the frontend is already integrated.
+
+### 12.1 Candidate registration and login
+
+| Method | Path | Purpose | Authentication | Success |
+|---|---|---|---|---|
+| `POST` | `/api/v1/auth/register` | Create a candidate account from the fields currently collected by the registration form | None | `201` |
+| `POST` | `/api/v1/auth/login` | Authenticate a candidate and return a session/token plus the authenticated candidate summary | None | `200` |
+
+`POST /api/v1/auth/register`
+
+Request:
+
+```json
+{
+  "firstName": "Alex",
+  "lastName": "Perera",
+  "email": "alex.perera@example.com",
+  "password": "candidate-password",
+  "role": "candidate"
+}
+```
+
+The frontend offers `recruiter` as another account type, but this section defines only candidate registration. Whether this shared form may create recruiter accounts, and whether `role` should be omitted and derived from a candidate-only route, are **DECISION REQUIRED**. The backend must not allow a caller to escalate a candidate account by changing `role`.
+
+`201 Created`:
+
+```json
+{
+  "data": {
+    "candidate": {
+      "id": "candidate_123",
+      "firstName": "Alex",
+      "lastName": "Perera",
+      "email": "alex.perera@example.com"
+    },
+    "accessToken": "token_issued_by_authentication_service"
+  }
+}
+```
+
+`POST /api/v1/auth/login`
+
+Request:
+
+```json
+{
+  "email": "alex.perera@example.com",
+  "password": "candidate-password",
+  "role": "candidate"
+}
+```
+
+`200 OK`:
+
+```json
+{
+  "data": {
+    "candidate": {
+      "id": "candidate_123",
+      "firstName": "Alex",
+      "lastName": "Perera",
+      "email": "alex.perera@example.com"
+    },
+    "accessToken": "token_issued_by_authentication_service"
+  }
+}
+```
+
+The token format, refresh-token policy, expiry, storage, and whether the selected `role` is checked or ignored are **DECISION REQUIRED**. Passwords must never be returned or logged. Duplicate email, invalid credentials, and invalid role values use the canonical error envelope.
+
+### 12.2 Candidate profile retrieval and update
+
+| Method | Path | Purpose | Authentication and authorization | Success |
+|---|---|---|---|---|
+| `GET` | `/api/v1/candidate/profile` | Return the authenticated candidate's editable profile and current resume summary | Bearer token; candidate may read only their own profile | `200` |
+| `PATCH` | `/api/v1/candidate/profile` | Update the profile fields rendered by the Profile screen | Bearer token; candidate may update only their own profile | `200` |
+
+`GET /api/v1/candidate/profile` and `200 OK`:
+
+```json
+{
+  "data": {
+    "id": "candidate_123",
+    "firstName": "Alex",
+    "lastName": "Perera",
+    "email": "alex.perera@example.com",
+    "phone": "+94 77 123 4567",
+    "location": "Colombo, Sri Lanka",
+    "summary": "Product-minded frontend developer.",
+    "skills": "React, JavaScript, HTML, CSS, Git, Figma",
+    "education": "BSc in Information Technology — University of Colombo, 2022",
+    "experience": "Frontend Developer at TechNova — 2022 to Present",
+    "resume": {
+      "id": "resume_123",
+      "fileName": "Alex_Perera_Resume.pdf",
+      "updatedAt": "2025-05-12T09:00:00+05:30",
+      "sizeBytes": 1258291,
+      "downloadUrl": "/api/v1/candidate/resume/download"
+    }
+  }
+}
+```
+
+`PATCH /api/v1/candidate/profile`
+
+Request:
+
+```json
+{
+  "firstName": "Alex",
+  "lastName": "Perera",
+  "email": "alex.perera@example.com",
+  "phone": "+94 77 123 4567",
+  "location": "Colombo, Sri Lanka",
+  "summary": "Product-minded frontend developer.",
+  "skills": "React, JavaScript, HTML, CSS, Git, Figma",
+  "education": "BSc in Information Technology — University of Colombo, 2022",
+  "experience": "Frontend Developer at TechNova — 2022 to Present"
+}
+```
+
+`200 OK` returns the updated profile in the same `data` shape as the retrieval response. `id`, `resume`, and timestamps are server-managed. Whether email changes are permitted through this endpoint or only through the account-email endpoint in section 12.5 is **DECISION REQUIRED**. The backend must validate email format and field lengths and must not expose another candidate's profile through an ID in the request.
+
+### 12.3 Public job browsing, searching, and job details
+
+| Method | Path | Purpose | Authentication and authorization | Success |
+|---|---|---|---|---|
+| `GET` | `/api/v1/jobs` | List public active jobs, with the filters used by Browse Jobs and the dashboard search | No authentication; return only publicly discoverable jobs | `200` |
+| `GET` | `/api/v1/jobs/{jobId}` | Return the public details needed by the Job Details screen | No authentication; a non-public job is not visible | `200` |
+
+`GET /api/v1/jobs?q=frontend&location=Colombo&jobType=full_time&page=1&pageSize=20`
+
+`200 OK`:
+
+```json
+{
+  "data": [
+    {
+      "id": "job_123",
+      "title": "Frontend Developer",
+      "company": "Tech Solutions Ltd.",
+      "location": "Colombo",
+      "jobType": "full_time",
+      "workArrangement": "hybrid",
+      "salaryMin": 120000,
+      "salaryMax": 180000,
+      "description": "Build high-quality web applications.",
+      "requirements": ["Good knowledge of React.js"],
+      "skills": ["React.js", "JavaScript", "HTML", "CSS"],
+      "status": "active",
+      "postedDate": "2026-10-02",
+      "deadline": "2026-10-31"
+    }
+  ],
+  "meta": {
+    "page": 1,
+    "pageSize": 20,
+    "total": 1,
+    "totalPages": 1
+  }
+}
+```
+
+Search should cover the job title and company, and may include location, description, requirements, and skills because those are the fields searched by the existing Candidate data helper. The exact matching, case-folding, default sort, maximum page size, and whether `deadline` or `status` controls public visibility are **DECISION REQUIRED**. The Candidate UI displays a salary string and title-case job-type labels, but the API must continue to use numeric salary fields and the canonical `jobType`/`workArrangement` fields defined in section 4.1.
+
+`GET /api/v1/jobs/job_123` returns `200 OK` with one `data` object using the same job fields as the list response. No candidate authorization is needed. The backend must not return closed or otherwise private jobs unless the team explicitly approves that visibility rule.
+
+### 12.4 Job application submission
+
+| Method | Path | Purpose | Authentication and authorization | Success |
+|---|---|---|---|---|
+| `POST` | `/api/v1/candidate/applications` | Submit the authenticated candidate's application for a public job | Bearer token; candidate may create an application only for themself and an eligible job | `201` |
+
+`POST /api/v1/candidate/applications`
+
+Request:
+
+```json
+{
+  "jobId": "job_123"
+}
+```
+
+The current Job Details screen has an Apply button but no additional cover-letter or application-question fields. Therefore no such fields are proposed. Whether an application must reference the candidate's current `resumeId`, and whether a cover letter is required later, are **DECISION REQUIRED**. If a resume is required, the backend should reject submission with a validation error rather than silently applying without it.
+
+`201 Created`:
+
+```json
+{
+  "data": {
+    "id": "application_123",
+    "jobId": "job_123",
+    "candidateId": "candidate_123",
+    "jobTitle": "Frontend Developer",
+    "company": "Tech Solutions Ltd.",
+    "location": "Colombo",
+    "jobType": "full_time",
+    "appliedDate": "2026-10-11",
+    "status": "pending",
+    "updatedAt": "2026-10-11T11:46:26+05:30"
+  }
+}
+```
+
+`appliedDate` is date-only and `updatedAt` is an ISO 8601 timestamp with an explicit offset. The server assigns `candidateId`, status, dates, and all relationship snapshots. Duplicate applications, closed/deadline-passed jobs, and whether a candidate may reapply after rejection are **DECISION REQUIRED**; conflicts must use `409`, not a success-shaped response.
+
+### 12.5 Candidate application listing and details
+
+| Method | Path | Purpose | Authentication and authorization | Success |
+|---|---|---|---|---|
+| `GET` | `/api/v1/candidate/applications` | List the authenticated candidate's applications, filtered by search text and status | Bearer token; return only the caller's applications | `200` |
+| `GET` | `/api/v1/candidate/applications/{applicationId}` | Return one application for the authenticated candidate | Bearer token; application must belong to the caller | `200` |
+
+`GET /api/v1/candidate/applications?q=frontend&status=shortlisted&page=1&pageSize=20`
+
+`200 OK`:
+
+```json
+{
+  "data": [
+    {
+      "id": "application_123",
+      "jobId": "job_123",
+      "candidateId": "candidate_123",
+      "jobTitle": "Frontend Developer",
+      "company": "Tech Solutions Ltd.",
+      "location": "Colombo",
+      "jobType": "full_time",
+      "appliedDate": "2026-10-02",
+      "status": "shortlisted",
+      "updatedAt": "2026-10-04T14:20:00+05:30"
+    }
+  ],
+  "meta": {
+    "page": 1,
+    "pageSize": 20,
+    "total": 1,
+    "totalPages": 1
+  }
+}
+```
+
+The `q` filter covers the job title and company displayed by the Candidate application list. The API returns canonical lowercase statuses; the frontend maps them to labels such as “Pending”, “Shortlisted”, “Interview”, and “Rejected”. Candidate application status is server-managed and cannot be changed by these endpoints.
+
+`GET /api/v1/candidate/applications/application_123` returns `200 OK` with one `data` object using the same fields as the list item. The frontend's `lastUpdated` display maps to canonical `updatedAt`; no separate `lastUpdated` field is required. The backend must enforce ownership even when an application ID is guessed.
+
+### 12.6 Candidate interview listing
+
+| Method | Path | Purpose | Authentication and authorization | Success |
+|---|---|---|---|---|
+| `GET` | `/api/v1/candidate/interviews` | List the authenticated candidate's upcoming, completed, and cancelled interviews | Bearer token; return only interviews belonging to the caller's applications | `200` |
+
+`GET /api/v1/candidate/interviews?status=scheduled&page=1&pageSize=20`
+
+`200 OK`:
+
+```json
+{
+  "data": [
+    {
+      "id": "interview_123",
+      "applicationId": "application_123",
+      "round": 1,
+      "interviewType": "technical",
+      "stage": "technical",
+      "scheduledAt": "2026-10-12T10:00:00+05:30",
+      "status": "scheduled",
+      "meetingLink": "https://meet.example.com/frontend-kasun",
+      "location": null,
+      "interviewer": "Sarah Johnson",
+      "notes": "Prepare for the technical discussion.",
+      "job": {
+        "id": "job_123",
+        "title": "Frontend Developer",
+        "company": "Tech Solutions Ltd."
+      },
+      "createdAt": "2026-10-05T09:00:00+05:30",
+      "updatedAt": "2026-10-05T09:00:00+05:30"
+    }
+  ],
+  "meta": {
+    "page": 1,
+    "pageSize": 20,
+    "total": 1,
+    "totalPages": 1
+  }
+}
+```
+
+The frontend displays date and time separately, but the API uses canonical `scheduledAt`. It displays “Upcoming”, “Completed”, and “Cancelled”; the API values are `scheduled`, `completed`, and `cancelled` as defined in section 7.2. `interviewer` is included because the existing Candidate screen displays it. Candidate interview data is read-only from this surface; scheduling, changing, completing, or cancelling remains governed by recruiter authorization and the existing recruiter endpoints. Whether candidates may see interviewer names, meeting links, notes, or cancelled interviews is **DECISION REQUIRED**.
+
+### 12.7 Candidate settings and account actions
+
+| Method | Path | Purpose | Authentication and authorization | Success |
+|---|---|---|---|---|
+| `GET` | `/api/v1/candidate/settings` | Return notification and profile-visibility preferences shown by Candidate Settings | Bearer token; candidate may read only their own settings | `200` |
+| `PATCH` | `/api/v1/candidate/settings` | Update notification toggles and profile visibility | Bearer token; candidate may update only their own settings | `200` |
+| `PATCH` | `/api/v1/candidate/account/email` | Change the account email from the Change email modal | Bearer token; candidate may change only their own email | `200` |
+| `POST` | `/api/v1/candidate/account/password` | Change the account password from the Change password modal | Bearer token; candidate may change only their own password | `200` |
+
+`GET /api/v1/candidate/settings` and `200 OK`:
+
+```json
+{
+  "data": {
+    "notifications": {
+      "recommendations": true,
+      "applications": true,
+      "interviews": true
+    },
+    "profileVisibility": "public"
+  }
+}
+```
+
+`PATCH /api/v1/candidate/settings`
+
+Request:
+
+```json
+{
+  "notifications": {
+    "recommendations": false,
+    "applications": true,
+    "interviews": true
+  },
+  "profileVisibility": "recruiters_only"
+}
+```
+
+`200 OK` returns the complete updated settings object in the same shape. Accepted visibility values are `public`, `recruiters_only`, and `private`, corresponding to the labels currently rendered by the UI. Whether profile visibility affects public profile search or only recruiter views is **DECISION REQUIRED**. Unknown fields, partial nested objects, and non-boolean notification values must use the canonical validation error.
+
+`PATCH /api/v1/candidate/account/email`
+
+Request:
+
+```json
+{
+  "currentPassword": "candidate-password",
+  "newEmail": "alex.new@example.com"
+}
+```
+
+`200 OK`:
+
+```json
+{
+  "data": {
+    "email": "alex.new@example.com"
+  }
+}
+```
+
+`POST /api/v1/candidate/account/password`
+
+Request:
+
+```json
+{
+  "currentPassword": "candidate-password",
+  "newPassword": "new-candidate-password"
+}
+```
+
+`200 OK`:
+
+```json
+{
+  "data": {
+    "updated": true
+  }
+}
+```
+
+The backend must not return passwords. Password policy, email verification, reauthentication, token invalidation after password/email change, and whether the frontend's logout action needs a server-side revocation endpoint are **DECISION REQUIRED**. The current Delete account button explicitly identifies itself as a frontend-only preview, so no delete endpoint is proposed.
+
+### 12.8 Resume upload and protected download
+
+| Method | Path | Purpose | Authentication and authorization | Success |
+|---|---|---|---|---|
+| `POST` | `/api/v1/candidate/resume` | Upload or replace the authenticated candidate's resume from the Profile screen | Bearer token; candidate may write only their own resume | `201` |
+| `GET` | `/api/v1/candidate/resume/download` | Download the authenticated candidate's current resume | Bearer token; candidate may download only their own resume | File response or `302` |
+
+The Profile screen includes a Replace control and displays filename, updated date, and size; therefore upload is required for the intended profile behavior. The resume download link is also proposed because resumes are shared with employers and the canonical application model contains a resume download URL. The current frontend does not expose a standalone download button, so whether candidate self-download is needed in the first release is **DECISION REQUIRED**.
+
+`POST /api/v1/candidate/resume` uses `multipart/form-data`, not JSON:
+
+```text
+Content-Disposition: form-data; name="file"; filename="Alex_Perera_Resume.pdf"
+Content-Type: application/pdf
+
+<binary file contents>
+```
+
+`201 Created`:
+
+```json
+{
+  "data": {
+    "id": "resume_123",
+    "fileName": "Alex_Perera_Resume.pdf",
+    "updatedAt": "2026-10-11T11:46:26+05:30",
+    "sizeBytes": 1258291,
+    "downloadUrl": "/api/v1/candidate/resume/download"
+  }
+}
+```
+
+`GET /api/v1/candidate/resume/download` must authenticate and authorize the candidate before returning the file. It may return the file directly with an appropriate `Content-Type` and `Content-Disposition`, or a short-lived protected redirect. The URL must not be a permanent public object-storage URL. Allowed file types, maximum size, malware scanning, replacement/version retention, storage provider, audit logging, and whether recruiters receive a separate short-lived application download URL are **DECISION REQUIRED**. Upload validation failures use the canonical `400`/`422` error envelope; a missing resume returns `404`.
+
+### 12.9 Candidate unresolved decisions
+
+1. Authentication provider, token/refresh-token format, expiry, storage, and role handling for the shared login/register form.
+2. Whether recruiter account creation remains available through the shared registration form or candidate registration becomes candidate-only.
+3. Whether candidate email changes are allowed through profile update, account settings only, or require verification.
+4. Whether an application requires the candidate's current resume, and whether cover letters or application questions will be added.
+5. Duplicate application and reapplication rules, including behavior for closed or deadline-passed jobs.
+6. Public job visibility rules, exact search matching, default sorting, and pagination limits.
+7. Candidate visibility semantics for `public`, `recruiters_only`, and `private`.
+8. Whether candidates may see interviewer names, meeting links, interview notes, and cancelled interviews.
+9. Password policy, reauthentication, email verification, and token invalidation after credential changes.
+10. Resume file types, size limits, malware scanning, retention, storage, audit policy, protected download mechanism, and candidate self-download.
+11. Whether logout requires server-side token revocation; the current UI can end a client session without a separate endpoint.
+
+## 13. Backend implementation checklist
 
 ### PROPOSED API CONTRACT
 
@@ -576,7 +1011,7 @@ The migration must not claim that integration is complete. It must add loading, 
 - [ ] Keep an OpenAPI document synchronized with this contract.
 - [ ] Update frontend services only after backend schemas and error codes are confirmed.
 
-## 13. Inspection and validation statement
+## 14. Inspection and validation statement
 
 This contract preserves the verified finding that current recruiter services use in-memory mock data and that no API endpoint, authentication integration, or backend implementation exists. The proposed sections are intentionally labeled separately and do not describe future endpoints as existing.
 
