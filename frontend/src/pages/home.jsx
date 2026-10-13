@@ -50,6 +50,13 @@ function Home(){
 
                 <div className="buttons">
 
+                    <button
+                   className="admin-portal-link"
+                   onClick={()=>navigate("/admin/login")}
+>
+                     Admin Portal
+                    </button>
+
                     <button 
                    className="login-btn"
                    onClick={()=>navigate("/login")}

@@ -2,7 +2,7 @@
 
 **Status:** Proposed contract for future backend implementation
 **Repository source of truth inspected:** `frontend/src` and `frontend/package.json`
-**Scope:** Recruiter dashboard, jobs, applications, interviews, recruiter profile, and recruiter settings
+**Scope:** Candidate and Recruiter requirements plus proposed Admin read-only APIs
 
 No endpoint described in this document currently exists. This document does not implement a backend, database schema, HTTP client, authentication, or frontend integration.
 
@@ -989,7 +989,183 @@ Content-Type: application/pdf
 10. Resume file types, size limits, malware scanning, retention, storage, audit policy, protected download mechanism, and candidate self-download.
 11. Whether logout requires server-side token revocation; the current UI can end a client session without a separate endpoint.
 
-## 13. Backend implementation checklist
+## 13. Admin API requirements
+
+### VERIFIED IN CURRENT CODE
+
+The Admin frontend has Dashboard, User Management, Job Management, Application Management, Activity Logs, and Settings pages. These pages currently use sample arrays and in-memory data; Admin has no API client or integration. Current Admin views are read-only for users, jobs, and applications. Dashboard date selection and activity navigation are disabled. Settings values and the Admin-only theme are preview/session state.
+
+### PROPOSED API CONTRACT
+
+Every endpoint in this section is **PROPOSED** and does not currently exist. The first Admin integration should be read-only. These endpoints reuse the `/api/v1` prefix, `{ "data": ... }` success envelope, list pagination envelope from section 5.1, structured errors from section 8, opaque string IDs, and date/time formats from section 3. They reuse the canonical Job and Application models from section 4 and the canonical Candidate/Recruiter identity concepts; they do not define replacement Candidate or Recruiter models.
+
+Every request requires an authenticated Admin principal. The proposed transport is `Authorization: Bearer <access-token>` as described in section 3, pending confirmation of the authentication provider and token mechanism. The backend must enforce Admin authorization on every request and resource lookup; hiding routes in the frontend is not authorization. A client-supplied role is never trusted. Until role names and authentication are agreed, endpoint access must be treated as undecided and unavailable for production.
+
+List endpoints use `page` and `pageSize` and return the section 5.1 envelope. The backend must document default/maximum page sizes, sort keys, filter enums, search fields, and query limits. Unless otherwise specified, expected failures use the section 8 error envelope: `400` invalid/unsupported query, `401` missing or invalid authentication, `403` insufficient Admin permission, `404` missing or out-of-scope resource, and `500` unexpected server failure. No endpoint below permits mutation.
+
+#### 13.1 Dashboard summary
+
+**`GET /api/v1/admin/dashboard` — Essential, proposed.** Returns server-calculated totals and a recent-activity preview for the Admin dashboard. Proposed query parameters: optional `from` and `to` as `YYYY-MM-DD` only if a date-windowed dashboard is approved; otherwise the endpoint returns a documented default reporting window. Invalid or unsupported range parameters return `400`; authentication/authorization and server errors follow the common cases above.
+
+Example `200 OK`:
+
+```json
+{
+  "data": {
+    "kpis": {
+      "totalUsers": 2486,
+      "totalCandidates": 1842,
+      "totalRecruiters": 644,
+      "totalJobs": 328,
+      "totalApplications": 5672
+    },
+    "recentActivity": [
+      {
+        "id": "activity_123",
+        "action": "user.created",
+        "summary": "A candidate account was created",
+        "occurredAt": "2026-10-12T10:00:00+05:30"
+      }
+    ]
+  }
+}
+```
+
+The recent-activity array is a bounded summary, not a paginated list; its maximum size, event fields, time window, and whether actor details are included require agreement. Counts must be calculated server-side from the same authorized data as list endpoints. If date-windowing is accepted, define whether user totals are current totals or registrations within the window.
+
+#### 13.2 Users
+
+**`GET /api/v1/admin/users` — Essential, proposed.** Lists Candidate and Recruiter accounts for review. Proposed query parameters: `q` (documented name/email matching), `role`, `status`, `page`, `pageSize`, and optional documented `sort`. Filtering and pagination occur on the server before returning the page; invalid role/status/sort/query values return `400`.
+
+Example `200 OK`:
+
+```json
+{
+  "data": [
+    {
+      "id": "user_123",
+      "name": "Alex Morgan",
+      "email": "alex@example.com",
+      "role": "candidate",
+      "status": "active",
+      "createdAt": "2026-10-02T09:00:00+05:30"
+    }
+  ],
+  "meta": { "page": 1, "pageSize": 20, "total": 1, "totalPages": 1 }
+}
+```
+
+**`GET /api/v1/admin/users/{userId}` — Essential, proposed.** Returns the Admin-visible identity fields for one Candidate or Recruiter. No query or body. Example `200 OK`: `{ "data": { "id": "user_123", "name": "Alex Morgan", "email": "alex@example.com", "role": "candidate", "status": "active", "createdAt": "2026-10-02T09:00:00+05:30" } }`. A missing or non-visible ID returns `404`; do not include credential material or private profile data not needed for Admin review.
+
+The exact `role` and `status` enums, whether Admin accounts appear in this list, and whether registration time is exposed as `createdAt` or another canonical timestamp require backend agreement. These examples are illustrative, not new agreed models.
+
+#### 13.3 Jobs
+
+**`GET /api/v1/admin/jobs` — Essential, proposed.** Read-only listing reusing the canonical Job model in section 4.1. Proposed query parameters: `q`, `status`, `jobType`, `page`, `pageSize`, and optional documented `sort`. Search fields and accepted enum values must be documented; filters and pagination are server-side. Invalid query values return `400`.
+
+Example `200 OK`:
+
+```json
+{
+  "data": [
+    {
+      "id": "job_123",
+      "title": "Frontend Developer",
+      "company": "Tech Solutions Ltd.",
+      "location": "Colombo",
+      "jobType": "full_time",
+      "workArrangement": "hybrid",
+      "status": "active",
+      "applicantsCount": 32,
+      "postedDate": "2026-10-02",
+      "deadline": "2026-10-31"
+    }
+  ],
+  "meta": { "page": 1, "pageSize": 20, "total": 1, "totalPages": 1 }
+}
+```
+
+**`GET /api/v1/admin/jobs/{jobId}` — Essential, proposed.** Returns one authorized Admin-visible canonical Job resource, including its canonical detail fields (`description`, `requirements`, and `skills`). No query or body. Example `200 OK`: `{ "data": { "id": "job_123", "title": "Frontend Developer", "company": "Tech Solutions Ltd.", "location": "Colombo", "jobType": "full_time", "workArrangement": "hybrid", "status": "active", "applicantsCount": 32, "postedDate": "2026-10-02", "deadline": "2026-10-31", "description": "Frontend role.", "requirements": ["React experience"], "skills": ["React"] } }`. Missing/out-of-scope IDs return `404`.
+
+Both routes are read-only; current Admin UI does not authorize create, update, close, reopen, or delete operations. `jobType`, `workArrangement`, and status values remain exactly as defined by the canonical Job contract; mock display values must be mapped rather than adopted as API enums.
+
+#### 13.4 Applications
+
+**`GET /api/v1/admin/applications` — Essential, proposed.** Read-only listing reusing the canonical Application model in section 4.2. Proposed query parameters: `q`, `status`, `jobId`, `page`, `pageSize`, and optional documented `sort`. Define `q` search fields; status and job filters plus pagination are server-side. Invalid query/filter values return `400`.
+
+Example `200 OK`:
+
+```json
+{
+  "data": [
+    {
+      "id": "application_123",
+      "jobId": "job_123",
+      "candidateId": "candidate_123",
+      "candidateName": "Alex Morgan",
+      "candidateEmail": "alex@example.com",
+      "jobTitle": "Frontend Developer",
+      "company": "Tech Solutions Ltd.",
+      "appliedDate": "2026-10-02",
+      "status": "shortlisted",
+      "experience": "3 years",
+      "skills": ["React", "JavaScript"],
+      "resume": null,
+      "updatedAt": "2026-10-04T14:20:00+05:30"
+    }
+  ],
+  "meta": { "page": 1, "pageSize": 20, "total": 1, "totalPages": 1 }
+}
+```
+
+**`GET /api/v1/admin/applications/{applicationId}` — Essential, proposed.** Returns one authorized Admin-visible canonical Application and documented relationship snapshots. No query or body. Example `200 OK` uses the same Application fields as above in a single `{ "data": {...} }` object. Missing/out-of-scope IDs return `404`.
+
+These routes do not grant resume download. The canonical `resume` field may be omitted or returned without a usable download URL for Admin unless the backend/product owner explicitly authorizes that access and defines protected delivery and audit requirements. Application status remains the canonical lowercase enum from section 7; no Admin status mutation is proposed.
+
+#### 13.5 Activity logs
+
+**`GET /api/v1/admin/activity-logs` — Essential for the existing Activity Logs page, proposed.** Lists authorized audit/activity events. Proposed query parameters: `q`, `category`, `from`, `to`, `page`, `pageSize`, and optional documented `sort`. `from`/`to` are date-only bounds with a documented timezone and inclusive/exclusive semantics. Filtering and pagination are server-side. Invalid ranges, categories, or sort values return `400`.
+
+Example `200 OK`:
+
+```json
+{
+  "data": [
+    {
+      "id": "activity_123",
+      "action": "application.shortlisted",
+      "category": "application",
+      "actor": "Recruiter",
+      "targetId": "application_123",
+      "summary": "Application shortlisted",
+      "occurredAt": "2026-10-12T10:00:00+05:30"
+    }
+  ],
+  "meta": { "page": 1, "pageSize": 20, "total": 1, "totalPages": 1 }
+}
+```
+
+Event vocabulary, actor representation, target visibility, redaction, retention, audit coverage, default sort, and date-range timezone require agreement. Activity logs are read-only through this endpoint.
+
+#### 13.6 Optional persisted platform settings
+
+Persisted Admin platform settings are **OPTIONAL and DECISION REQUIRED**; current Settings Apply/Reset values are preview-only, and the Admin theme is local session state. If the group decides that platform-wide name/description must persist, proposed endpoints are `GET /api/v1/admin/settings` and `PATCH /api/v1/admin/settings`, both Admin-authorized, with `{ "data": { "platformName": "JobRecruit", "platformDescription": "Recruitment platform" } }` on read and a body containing only approved editable fields on update. The update response should return the complete updated `{ "data": {...} }` object with `updatedAt`. Validation uses the common `400`/`422` errors; authentication and authorization use `401`/`403`; unexpected failures use `500`. This optional proposal is not permission to persist Admin account profile or appearance fields, and no reset endpoint is proposed.
+
+### DECISION REQUIRED
+
+Before implementation, the backend developer/product owner must agree on:
+
+1. Authentication provider, token lifecycle, Admin role name, Admin provisioning, login/session behavior, and whether existing Candidate/Recruiter authentication serves Admin.
+2. User-list role scope and canonical user roles/statuses, including whether Admin accounts appear. Reconcile mock title-case `Candidate`/`Recruiter`, `Active`/`Inactive`, numeric IDs, and date-only `registered` with canonical lowercase roles/statuses, opaque IDs, and timestamp rules.
+3. Whether Admin endpoints return the exact canonical Job/Application models or a documented safe projection. Reconcile mock job types (`Full-time`, `Hybrid`, `Remote`) with canonical `jobType` versus `workArrangement`; confirm Job status values and application status enum compatibility.
+4. Dashboard count definitions, reporting window, timezone, recent-activity schema/count, and whether a date-range query is needed.
+5. Activity event schema, categories, actor/target disclosure, retention, redaction, sort, and filtering semantics.
+6. Whether any Admin mutations are needed later. The initial contract is read-only; it deliberately adds no user suspend/reactivate, job state, or application state mutation.
+7. Whether Admin may view or download resumes. No download access is implied by the proposal.
+8. Whether platform settings require persistence. If yes, define editable fields, audit rules, and whether those settings are global or tenant-scoped.
+9. Defaults and maximums for pagination, search semantics/limits, sort fields, date-range boundaries, and common error details for Admin routes.
+
+## 14. Backend implementation checklist
 
 ### PROPOSED API CONTRACT
 
@@ -1005,17 +1181,19 @@ Content-Type: application/pdf
 - [ ] Validate conditional `meetingLink` and `location` fields.
 - [ ] Implement list filtering, pagination, sorting, and documented limits.
 - [ ] Implement recruiter-scoped authorization on every endpoint.
+- [ ] Agree on and implement Admin authentication/authorization before exposing proposed Admin endpoints; keep initial Admin access read-only unless privileged mutations are explicitly agreed.
+- [ ] Confirm Admin role/status models, activity event policy, and whether platform settings persist before implementing those optional or unresolved requirements.
 - [ ] Implement protected resume access if resumes are in production scope.
 - [ ] Return the documented success/error envelopes and HTTP statuses.
 - [ ] Add contract and integration tests for authorization, validation, transitions, transactions, and multiple interview rounds.
 - [ ] Keep an OpenAPI document synchronized with this contract.
 - [ ] Update frontend services only after backend schemas and error codes are confirmed.
 
-## 14. Inspection and validation statement
+## 15. Inspection and validation statement
 
-This contract preserves the verified finding that current recruiter services use in-memory mock data and that no API endpoint, authentication integration, or backend implementation exists. The proposed sections are intentionally labeled separately and do not describe future endpoints as existing.
+This document records proposed Candidate, Recruiter, and Admin API requirements. It preserves the verified finding that current recruiter and Admin services use in-memory mock data and that no API endpoint, authentication integration, or backend implementation exists. Proposed sections are intentionally labeled separately and do not describe future endpoints as existing.
 
-The document was reviewed for consistency between endpoint paths, request/response examples, canonical model names, ID and date conventions, application/interview transitions, transactional interview scheduling, and service migration mapping. JSON examples were reviewed for valid syntax and consistent envelopes.
+The document was reviewed for consistency between endpoint paths, request/response examples, canonical model names, ID and date conventions, application/interview transitions, Admin read-only scope, and service migration mapping. JSON examples were reviewed for valid syntax and consistent envelopes.
 
 **Exact file changed:** `docs/API_CONTRACT.md`
 **Application code changed:** No

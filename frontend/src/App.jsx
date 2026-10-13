@@ -27,6 +27,14 @@ import ManageJobs from "./pages/recruiter/manageJobs";
 import PostJob from "./pages/recruiter/postJob";
 import RecruiterProfile from "./pages/recruiter/profile";
 import RecruiterSettings from "./pages/recruiter/settings";
+import AdminDashboard from "./pages/admin/dashboard";
+import AdminLogin from "./pages/admin/login";
+import AdminUsers from "./pages/admin/users";
+import AdminJobs from "./pages/admin/jobs";
+import AdminApplications from "./pages/admin/applications";
+import AdminActivityLogs from "./pages/admin/activityLogs";
+import AdminSettings from "./pages/admin/settings";
+import { AdminThemeProvider } from "./pages/admin/AdminThemeContext";
 
 function App() {
   return (
@@ -185,6 +193,23 @@ function App() {
         <Route
           path="/recruiter/settings"
           element={<RecruiterSettings />}
+        />
+
+        {/* Admin Dashboard */}
+        {/* Preview route only: protect production access with backend authentication and Admin-role authorization. */}
+        <Route path="/admin" element={<AdminThemeProvider />}>
+          <Route path="dashboard" element={<AdminDashboard />} />
+          <Route path="users" element={<AdminUsers />} />
+          <Route path="jobs" element={<AdminJobs />} />
+          <Route path="applications" element={<AdminApplications />} />
+          <Route path="activity-logs" element={<AdminActivityLogs />} />
+          <Route path="settings" element={<AdminSettings />} />
+        </Route>
+
+        {/* Admin Login */}
+        <Route
+          path="/admin/login"
+          element={<AdminLogin />}
         />
 
       </Routes>
