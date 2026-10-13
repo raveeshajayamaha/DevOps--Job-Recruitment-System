@@ -11,64 +11,66 @@ function Home(){
 
             {/* Navigation Bar */}
 
-            <nav className="navbar">
+           <nav className="navbar">
+
+    <div className="logo">
+        👥 <span>JobRecruit</span>
+    </div>
 
 
-                <div className="logo">
+    <div className="nav-links">
 
-                    👥 <span>JobRecruit</span>
+        <a className="active">
+            Home
+        </a>
 
-                </div>
+        <a href="#about">
+            About
+        </a>
 
+        <a href="#jobs">
+            Jobs
+        </a>
 
+        <a href="#companies">
+            Companies
+        </a>
 
-                <div className="nav-links">
+        <a href="#contact">
+            Contact
+        </a>
 
-                    <a className="active">
-                        Home
-                    </a>
-
-                    <a>
-                        About
-                    </a>
-
-                    <a>
-                        Jobs
-                    </a>
-
-                    <a>
-                        Companies
-                    </a>
-
-                    <a>
-                        Contact
-                    </a>
-
-                </div>
+    </div>
 
 
+    <div className="buttons">
 
-                <div className="buttons">
-
-                    <button 
-                   className="login-btn"
-                   onClick={()=>navigate("/login")}
->
-                     Login
-                    </button>
-
-
-                   <button 
-                   className="register-btn"
-                onClick={()=>navigate("/register")}
->
-                  Register
-                   </button>
-
-                </div>
+        <button
+            className="dashboard-btn"
+            onClick={() => navigate("/dashboard")}
+        >
+            Dashboard
+        </button>
 
 
-            </nav>
+        <button
+            className="login-btn"
+            onClick={() => navigate("/")}
+        >
+            Login
+        </button>
+
+
+        <button
+            className="register-btn"
+            onClick={() => navigate("/register")}
+        >
+            Register
+        </button>
+
+    </div>
+
+</nav>
 
 
 

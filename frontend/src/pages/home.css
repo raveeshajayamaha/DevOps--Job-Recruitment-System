@@ -192,7 +192,7 @@ h1{
 
     font-size:75px;
 
-    line-height:1.05;
+    line-height:1.15;
 
     color:#071525;
 
@@ -332,6 +332,11 @@ h1 span{
 
 }
 
+.dashboard-link {
+    color: #1465e8 !important;
+    font-weight: 600;
+    cursor: pointer;
+}
 
 
 .card h3{
