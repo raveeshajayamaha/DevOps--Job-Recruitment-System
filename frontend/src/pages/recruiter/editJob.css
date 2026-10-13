@@ -1,0 +1,24 @@
+.edit-job-not-found {
+  min-height: 240px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 10px;
+  text-align: center;
+}
+
+.edit-job-not-found strong {
+  color: #0f172a;
+  font-size: 20px;
+}
+
+.edit-job-not-found span {
+  margin-bottom: 8px;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.edit-job-form-error {
+  margin-top: 18px;
+}

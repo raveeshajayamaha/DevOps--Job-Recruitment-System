@@ -1,0 +1,66 @@
+.admin-applications-summary { grid-template-columns: repeat(4,minmax(0,1fr)); }
+.admin-applications-summary .admin-stat-card { min-height:108px; align-items:center; padding:15px 17px; }
+.admin-applications-summary .admin-stat-icon { width:36px; height:36px; }
+.admin-applications-summary .admin-stat-value { margin-top:3px; }
+.admin-applications-caption { margin-top:3px; color:#68758a; font-size:11px; }
+.admin-applications-panel { margin-top:2px; }
+.admin-applications-filters { display:flex; align-items:flex-end; gap:12px; padding:0 19px 16px; }
+.admin-applications-search { display:flex; min-width:220px; height:39px; flex:1; align-items:center; gap:8px; padding:0 11px; border:1px solid #cbd4e2; border-radius:7px; background:#fff; color:#526078; }
+.admin-applications-search>span { font-size:20px; line-height:1; }
+.admin-applications-search input { width:100%; min-width:0; border:0; outline:0; background:#fff; color:#263247; caret-color:#244db8; font:inherit; font-size:13px; }
+.admin-applications-search input::placeholder { color:#69758b; opacity:1; }
+.admin-applications-select { display:grid; gap:4px; color:#526078; font-size:12px; font-weight:600; }
+.admin-applications-select select { min-width:155px; height:39px; padding:0 30px 0 10px; border:1px solid #cbd4e2; border-radius:7px; background:#fff; color:#263247; color-scheme:light; cursor:pointer; font:inherit; font-size:12px; }
+.admin-applications-select option { background:#fff; color:#263247; }
+.admin-applications-search:focus-within,.admin-applications-select select:focus-visible,.admin-applications-pagination button:focus-visible,.admin-application-view:focus-visible,.admin-application-modal button:focus-visible { outline:3px solid #3964d866; outline-offset:2px; }
+.admin-applications-table-wrap { width:100%; overflow-x:auto; }
+.admin-applications-table { width:100%; border-collapse:collapse; text-align:left; white-space:nowrap; }
+.admin-applications-table th { height:40px; padding:0 12px; border-top:1px solid #edf0f5; border-bottom:1px solid #edf0f5; background:#fafbfc; color:#657187; font-size:12px; font-weight:650; }
+.admin-applications-table td { height:58px; padding:8px 12px; border-bottom:1px solid #f0f2f6; color:#536078; font-size:13px; }
+.admin-applications-table th:first-child,.admin-applications-table td:first-child { padding-left:19px; }
+.admin-applications-table td:first-child strong { color:#354157; font-weight:650; }
+.admin-application-status { display:inline-flex; align-items:center; gap:6px; color:#526078; text-transform:capitalize; }
+.admin-application-status>span { width:7px; height:7px; border-radius:50%; background:#8994a6; }
+.admin-application-status.pending { color:#946b25; }.admin-application-status.pending>span { background:#dfa944; }
+.admin-application-status.shortlisted { color:#278260; }.admin-application-status.shortlisted>span { background:#37b17b; }
+.admin-application-status.rejected { color:#a45a67; }.admin-application-status.rejected>span { background:#ca7785; }
+.admin-application-view { padding:6px 8px; border:0; border-radius:5px; background:transparent; color:#3964d8; cursor:pointer; font:inherit; font-size:11px; font-weight:600; }
+.admin-application-view:hover { background:#f1f5ff; }
+.admin-applications-pagination { display:flex; min-height:48px; align-items:center; justify-content:space-between; gap:12px; padding:0 19px; color:#66738a; font-size:11px; }
+.admin-applications-pagination>div { display:flex; align-items:center; gap:10px; }.admin-applications-pagination button { padding:6px 9px; border:1px solid #d6deea; border-radius:5px; background:#fff; color:#4e5b72; cursor:pointer; font:inherit; }.admin-applications-pagination button:disabled { color:#929bac; cursor:not-allowed; }
+.admin-applications-empty { display:grid; min-height:210px; align-content:center; justify-items:center; border-top:1px solid #f0f2f6; text-align:center; }.admin-applications-empty>span { display:grid; width:37px; height:37px; place-items:center; border-radius:50%; background:#f1f5ff; color:#5876cc; font-size:22px; }.admin-applications-empty h3 { margin:11px 0 3px; color:#354157; font-size:14px; }.admin-applications-empty p { margin:0; color:#66738a; font-size:12px; }
+.admin-application-modal-backdrop { position:fixed; inset:0; z-index:10; display:grid; place-items:center; overflow-y:auto; padding:20px; background:#10192b80; }
+.admin-application-modal { position:relative; width:min(100%,560px); max-height:calc(100vh - 40px); overflow-y:auto; padding:27px; border:1px solid #e9edf3; border-radius:12px; background:#fff; box-shadow:0 20px 60px #10192b33; }
+.admin-application-modal-close { position:absolute; top:12px; right:13px; width:30px; height:30px; border:0; border-radius:6px; background:transparent; color:#58647a; cursor:pointer; font-size:22px; }
+.admin-application-modal h2 { margin:5px 0 15px; color:#243047; font-size:20px; }
+.admin-application-modal dl { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; margin:18px 0; padding:17px 0; border-top:1px solid #edf0f5; border-bottom:1px solid #edf0f5; }.admin-application-modal dl div { display:grid; min-width:0; gap:4px; }.admin-application-modal dt { color:#66738a; font-size:11px; }.admin-application-modal dd { overflow-wrap:anywhere; margin:0; color:#39455b; font-size:12px; font-weight:600; }
+.admin-application-modal-done { min-height:35px; margin-top:8px; padding:0 15px; border:0; border-radius:6px; background:#3867e8; color:#fff; cursor:pointer; font:inherit; font-size:12px; font-weight:650; }
+@media(max-width:1050px) { .admin-applications-table th,.admin-applications-table td { padding-right:9px; padding-left:9px; } }
+@media(max-width:760px) { .admin-applications-summary { grid-template-columns:repeat(2,minmax(0,1fr)); }.admin-applications-filters { align-items:stretch; flex-wrap:wrap; padding-right:12px; padding-left:12px; }.admin-applications-search { min-width:100%; }.admin-applications-select { flex:1; }.admin-applications-select select { width:100%; }.admin-applications-pagination { align-items:flex-start; flex-direction:column; padding:12px; }.admin-applications-pagination>div { width:100%; justify-content:space-between; }.admin-applications-table th:first-child,.admin-applications-table td:first-child { padding-left:12px; }.admin-application-modal { padding:23px 18px; } }
+
+.admin-dashboard[data-admin-theme="dark"] .admin-applications-caption,
+.admin-dashboard[data-admin-theme="dark"] .admin-applications-select,
+.admin-dashboard[data-admin-theme="dark"] .admin-applications-pagination,
+.admin-dashboard[data-admin-theme="dark"] .admin-applications-empty p,
+.admin-dashboard[data-admin-theme="dark"] .admin-application-modal dt { color:#aab6c9; }
+.admin-dashboard[data-admin-theme="dark"] .admin-applications-search,
+.admin-dashboard[data-admin-theme="dark"] .admin-applications-search input,
+.admin-dashboard[data-admin-theme="dark"] .admin-applications-select select,
+.admin-dashboard[data-admin-theme="dark"] .admin-applications-select option,
+.admin-dashboard[data-admin-theme="dark"] .admin-applications-pagination button,
+.admin-dashboard[data-admin-theme="dark"] .admin-application-modal { border-color:#35435a; background:#202d43; color:#e5ebf5; color-scheme:dark; }
+.admin-dashboard[data-admin-theme="dark"] .admin-applications-search input::placeholder { color:#aab6c9; }
+.admin-dashboard[data-admin-theme="dark"] .admin-applications-table th { border-color:#35435a; background:#202d43; color:#c0cad9; }
+.admin-dashboard[data-admin-theme="dark"] .admin-applications-table td,
+.admin-dashboard[data-admin-theme="dark"] .admin-application-modal dl { border-color:#303d53; color:#c4cede; }
+.admin-dashboard[data-admin-theme="dark"] .admin-applications-table td:first-child strong,
+.admin-dashboard[data-admin-theme="dark"] .admin-application-modal h2,
+.admin-dashboard[data-admin-theme="dark"] .admin-application-modal dd { color:#e5ebf5; }
+.admin-dashboard[data-admin-theme="dark"] .admin-application-status { color:#c4cede; }
+.admin-dashboard[data-admin-theme="dark"] .admin-application-status.pending { color:#ffd27f; }
+.admin-dashboard[data-admin-theme="dark"] .admin-application-status.shortlisted { color:#83d7b3; }
+.admin-dashboard[data-admin-theme="dark"] .admin-application-status.rejected { color:#efa8b5; }
+.admin-dashboard[data-admin-theme="dark"] .admin-applications-empty { border-color:#303d53; }
+.admin-dashboard[data-admin-theme="dark"] .admin-applications-empty>span { background:#273858; color:#b6c9ff; }
+.admin-dashboard[data-admin-theme="dark"] .admin-applications-empty h3,
+.admin-dashboard[data-admin-theme="dark"] .admin-application-modal-close { color:#e5ebf5; }

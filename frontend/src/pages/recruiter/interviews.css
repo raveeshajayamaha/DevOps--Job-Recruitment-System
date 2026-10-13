@@ -1,0 +1,356 @@
+.interviews-card,
+.schedule-card,
+.interview-detail-card,
+.interview-status-card {
+  padding: 22px;
+}
+
+.interviews-toolbar,
+.interviews-filters,
+.interview-row,
+.interview-detail-heading,
+.schedule-candidate,
+.schedule-actions {
+  display: flex;
+  align-items: center;
+}
+
+.interviews-toolbar {
+  justify-content: space-between;
+  gap: 18px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #edf0f5;
+}
+
+.interviews-toolbar h2,
+.interviews-toolbar p,
+.interview-detail-heading h2,
+.interview-detail-heading p,
+.interview-status-card h2,
+.schedule-heading h2,
+.schedule-heading p {
+  margin: 0;
+}
+
+.interviews-toolbar h2,
+.schedule-heading h2 {
+  color: #0f172a;
+  font-size: 20px;
+}
+
+.interviews-toolbar p,
+.schedule-heading p,
+.interview-status-card > p {
+  margin-top: 7px;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.interviews-filters {
+  align-items: flex-end;
+  gap: 14px;
+  padding: 20px 0;
+}
+
+.interviews-filters label,
+.schedule-field {
+  min-width: 150px;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 7px;
+  color: #334155;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.interviews-filters input,
+.interviews-filters select,
+.schedule-field input,
+.schedule-field select,
+.schedule-field textarea {
+  width: 100%;
+  min-height: 42px;
+  padding: 10px 12px;
+  border: 1px solid #dbe2ec;
+  border-radius: 8px;
+  background: #fbfcfe;
+  color: #0f172a;
+  font: inherit;
+  font-size: 13px;
+  outline: none;
+}
+
+.interviews-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.interview-row {
+  min-width: 0;
+  gap: 14px;
+  padding: 18px 0;
+  border-top: 1px solid #edf0f5;
+}
+
+.interview-row:first-child {
+  border-top: none;
+}
+
+.interview-person,
+.interview-job,
+.interview-schedule,
+.interview-row-action {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.interview-person,
+.interview-job {
+  flex: 1;
+}
+
+.interview-schedule {
+  flex: 1.1;
+}
+
+.interview-row-action {
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.interview-person strong,
+.interview-job strong,
+.interview-schedule strong {
+  color: #0f172a;
+  font-size: 13px;
+}
+
+.interview-person span,
+.interview-job span,
+.interview-schedule span {
+  color: #64748b;
+  font-size: 11px;
+}
+
+.interview-details-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(280px, 1fr);
+  align-items: start;
+  gap: 20px;
+}
+
+.interview-detail-heading {
+  gap: 14px;
+  padding-bottom: 22px;
+  border-bottom: 1px solid #edf0f5;
+}
+
+.interview-detail-heading h2 {
+  color: #0f172a;
+  font-size: 21px;
+}
+
+.interview-detail-heading p {
+  margin-top: 5px;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.interview-detail-heading .recruiter-status {
+  margin-left: auto;
+}
+
+.interview-detail-section + .interview-detail-section {
+  margin-top: 26px;
+  padding-top: 24px;
+  border-top: 1px solid #edf0f5;
+}
+
+.interview-detail-section h2,
+.interview-status-card h2 {
+  margin: 0 0 15px;
+  color: #0f172a;
+  font-size: 18px;
+}
+
+.interview-detail-facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.interview-detail-fact {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 16px;
+}
+
+.interview-detail-fact span {
+  color: #94a3b8;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.interview-detail-fact strong {
+  color: #334155;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.interview-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.interview-actions button {
+  min-height: 40px;
+  flex: 1;
+  border: 0;
+  border-radius: 8px;
+  color: #fff;
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.schedule-heading {
+  padding-bottom: 20px;
+  border-bottom: 1px solid #edf0f5;
+}
+
+.schedule-candidate {
+  align-items: flex-start;
+  flex-direction: column;
+  gap: 5px;
+  padding: 18px 0;
+}
+
+.schedule-candidate strong {
+  color: #0f172a;
+  font-size: 15px;
+}
+
+.schedule-candidate span {
+  color: #64748b;
+  font-size: 13px;
+}
+
+.schedule-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.schedule-field:last-of-type {
+  grid-column: 1 / -1;
+}
+
+.schedule-field textarea {
+  resize: vertical;
+}
+
+.schedule-error {
+  color: #dc2626;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.schedule-actions {
+  justify-content: flex-end;
+  grid-column: 1 / -1;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.schedule-actions .recruiter-primary-button {
+  border: 0;
+  cursor: pointer;
+  font: inherit;
+}
+
+.edit-job-cancel {
+  display: inline-flex;
+  align-items: center;
+  min-height: 42px;
+  padding: 0 18px;
+  border: 1px solid #dbe2ec;
+  border-radius: 8px;
+  color: #475569;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+@media (max-width: 900px) {
+  .interview-details-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .interviews-filters {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .interview-row {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .interview-person,
+  .interview-job,
+  .interview-schedule {
+    flex: 1 1 calc(50% - 14px);
+  }
+
+  .interview-row-action {
+    align-items: flex-start;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+    margin-left: 50px;
+  }
+}
+
+@media (max-width: 540px) {
+  .interviews-card,
+  .schedule-card,
+  .interview-detail-card,
+  .interview-status-card {
+    padding: 17px;
+  }
+
+  .interviews-toolbar,
+  .interview-detail-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .interview-detail-heading .recruiter-status {
+    margin-left: 0;
+  }
+
+  .interview-detail-facts,
+  .schedule-form {
+    grid-template-columns: 1fr;
+  }
+
+  .schedule-field:last-of-type,
+  .schedule-actions {
+    grid-column: auto;
+  }
+
+  .schedule-actions {
+    align-items: stretch;
+    flex-direction: column-reverse;
+  }
+}

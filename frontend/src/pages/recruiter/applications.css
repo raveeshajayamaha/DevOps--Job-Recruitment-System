@@ -1,0 +1,347 @@
+.recruiter-applications-card {
+  padding: 22px;
+}
+
+.applications-toolbar,
+.applications-filters,
+.application-row,
+.application-detail-heading,
+.application-current-status {
+  display: flex;
+  align-items: center;
+}
+
+.applications-toolbar {
+  justify-content: space-between;
+  gap: 18px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #edf0f5;
+}
+
+.applications-toolbar h2,
+.applications-toolbar p,
+.application-detail-heading h2,
+.application-detail-heading p,
+.application-status-card h2,
+.application-status-card p {
+  margin: 0;
+}
+
+.applications-toolbar h2 {
+  color: #0f172a;
+  font-size: 20px;
+}
+
+.applications-toolbar p,
+.application-status-card p {
+  margin-top: 7px;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.applications-count {
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.applications-filters {
+  align-items: flex-end;
+  gap: 14px;
+  padding: 20px 0;
+}
+
+.applications-filters label {
+  min-width: 150px;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 7px;
+  color: #334155;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.applications-filters input,
+.applications-filters select {
+  width: 100%;
+  min-height: 42px;
+  padding: 0 12px;
+  border: 1px solid #dbe2ec;
+  border-radius: 8px;
+  background: #fbfcfe;
+  color: #0f172a;
+  font: inherit;
+  font-size: 13px;
+  outline: none;
+}
+
+.applications-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.application-row {
+  min-width: 0;
+  gap: 14px;
+  padding: 18px 0;
+  border-top: 1px solid #edf0f5;
+}
+
+.application-row:first-child {
+  border-top: none;
+}
+
+.application-candidate,
+.application-job,
+.application-date,
+.application-row-action {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.application-candidate {
+  flex: 1.2;
+}
+
+.application-job {
+  flex: 1;
+}
+
+.application-date {
+  flex: 0.7;
+}
+
+.application-row-action {
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.application-candidate strong,
+.application-job strong,
+.application-date strong {
+  color: #0f172a;
+  font-size: 13px;
+}
+
+.application-candidate span,
+.application-job span,
+.application-date span {
+  color: #64748b;
+  font-size: 11px;
+}
+
+.applications-empty,
+.application-not-found {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 220px;
+  text-align: center;
+}
+
+.applications-empty strong,
+.application-not-found strong {
+  color: #0f172a;
+  font-size: 17px;
+}
+
+.applications-empty span,
+.application-not-found span {
+  color: #64748b;
+  font-size: 13px;
+}
+
+.application-details-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(280px, 1fr);
+  align-items: start;
+  gap: 20px;
+}
+
+.application-detail-card,
+.application-status-card {
+  padding: 24px;
+}
+
+.application-detail-heading {
+  gap: 14px;
+  padding-bottom: 22px;
+  border-bottom: 1px solid #edf0f5;
+}
+
+.application-detail-heading h2 {
+  color: #0f172a;
+  font-size: 21px;
+}
+
+.application-detail-heading p {
+  margin-top: 5px;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.application-detail-heading .recruiter-status {
+  margin-left: auto;
+}
+
+.application-detail-section + .application-detail-section {
+  margin-top: 26px;
+  padding-top: 24px;
+  border-top: 1px solid #edf0f5;
+}
+
+.application-detail-section h2,
+.application-status-card h2 {
+  margin: 0 0 15px;
+  color: #0f172a;
+  font-size: 18px;
+}
+
+.application-detail-facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.application-detail-fact {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.application-detail-fact span,
+.application-current-status span {
+  color: #94a3b8;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.application-detail-fact strong {
+  color: #334155;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.application-current-status {
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 26px;
+  padding: 15px;
+  border-radius: 9px;
+  background: #f8fafc;
+}
+
+.application-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.application-actions button {
+  min-height: 40px;
+  flex: 1;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  color: #fff;
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.application-shortlist-button {
+  background: #16a34a;
+}
+
+.application-reject-button {
+  background: #dc2626;
+}
+
+.application-status-card .post-job-success {
+  margin-top: 18px;
+}
+
+.application-interview-link {
+  width: 100%;
+  margin-top: 18px;
+}
+
+.application-schedule-note {
+  margin: 18px 0 0;
+  color: #64748b;
+  font-size: 12px;
+}
+
+.application-not-found {
+  padding: 30px;
+}
+
+.application-not-found .recruiter-primary-button {
+  margin-top: 8px;
+}
+
+@media (max-width: 900px) {
+  .application-details-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .applications-filters {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .application-row {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .application-candidate,
+  .application-job,
+  .application-date {
+    flex: 1 1 calc(50% - 14px);
+  }
+
+  .application-row-action {
+    align-items: flex-start;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+    margin-left: 50px;
+  }
+}
+
+@media (max-width: 540px) {
+  .recruiter-applications-card,
+  .application-detail-card,
+  .application-status-card {
+    padding: 17px;
+  }
+
+  .applications-toolbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .application-detail-heading {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .application-detail-heading .recruiter-status {
+    margin-left: 0;
+  }
+
+  .application-detail-facts {
+    grid-template-columns: 1fr;
+  }
+}

@@ -11,65 +11,51 @@ function Home(){
 
             {/* Navigation Bar */}
 
-           <nav className="navbar">
 
-    <div className="logo">
-        👥 <span>JobRecruit</span>
-    </div>
+<nav className="navbar">
+  <div className="logo">
+    👥 <span>JobRecruit</span>
+  </div>
 
+  <div className="nav-links">
+    <a className="active" href="/">
+      Home
+    </a>
+    <a href="#about">About</a>
+    <a href="#jobs">Jobs</a>
+    <a href="#companies">Companies</a>
+    <a href="#contact">Contact</a>
+  </div>
 
-    <div className="nav-links">
+  <div className="buttons">
+    <button
+      className="dashboard-btn"
+      onClick={() => navigate("/dashboard")}
+    >
+      Dashboard
+    </button>
 
-        <a className="active">
-            Home
-        </a>
+    <button
+      className="admin-portal-link"
+      onClick={() => navigate("/admin/login")}
+    >
+      Admin Portal
+    </button>
 
-        <a href="#about">
-            About
-        </a>
+    <button
+      className="login-btn"
+      onClick={() => navigate("/login")}
+    >
+      Login
+    </button>
 
-        <a href="#jobs">
-            Jobs
-        </a>
-
-        <a href="#companies">
-            Companies
-        </a>
-
-        <a href="#contact">
-            Contact
-        </a>
-
-    </div>
-
-
-    <div className="buttons">
-
-        <button
-            className="dashboard-btn"
-            onClick={() => navigate("/dashboard")}
-        >
-            Dashboard
-        </button>
-
-
-        <button
-            className="login-btn"
-            onClick={() => navigate("/")}
-        >
-            Login
-        </button>
-
-
-        <button
-            className="register-btn"
-            onClick={() => navigate("/register")}
-        >
-            Register
-        </button>
-
-    </div>
-
+    <button
+      className="register-btn"
+      onClick={() => navigate("/register")}
+    >
+      Register
+    </button>
+  </div>
 </nav>
 
 
@@ -244,6 +230,5 @@ function Home(){
     )
 
 }
-
 
 export default Home;

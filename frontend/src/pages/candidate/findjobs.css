@@ -1,0 +1,588 @@
+/* =========================================================
+   FIND JOBS PAGE
+   JobRecruit - Candidate Job Search
+========================================================= */
+
+
+/* =========================
+   Main Page
+========================= */
+
+.find-jobs-page {
+  min-height: 100vh;
+  padding: 40px 6%;
+  background: #f5f7fb;
+  color: #0f172a;
+  box-sizing: border-box;
+}
+
+
+/* =========================
+   Header
+========================= */
+
+.find-jobs-header {
+  max-width: 1200px;
+  margin: 0 auto 42px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+
+  gap: 30px;
+}
+
+.find-jobs-header h1 {
+  margin: 0;
+
+  font-size: 42px;
+  font-weight: 700;
+
+  color: #0f172a;
+}
+
+.find-jobs-header p {
+  margin-top: 8px;
+  margin-bottom: 0;
+
+  font-size: 18px;
+  color: #64748b;
+}
+
+
+/* =========================
+   Dashboard Link
+========================= */
+
+.back-dashboard {
+  display: inline-flex;
+  align-items: center;
+
+  padding: 10px 16px;
+
+  color: #2563eb !important;
+
+  font-size: 17px;
+  font-weight: 600;
+
+  text-decoration: none;
+
+  border-radius: 8px;
+
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+
+/* Mouse hover */
+
+.back-dashboard:hover {
+  color: #1d4ed8 !important;
+
+  background-color: #eaf2ff;
+
+  text-decoration: underline;
+
+  transform: translateY(-1px);
+}
+
+
+/* Keyboard focus */
+
+.back-dashboard:focus-visible {
+  outline: 3px solid #93c5fd;
+  outline-offset: 3px;
+
+  border-radius: 8px;
+}
+
+
+/* =========================
+   Search Section
+========================= */
+
+.job-search-section {
+  max-width: 1200px;
+  margin: 0 auto 48px;
+
+  padding: 32px;
+
+  background: #ffffff;
+
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+
+  box-shadow:
+    0 8px 25px rgba(15, 23, 42, 0.06);
+
+  display: grid;
+
+  grid-template-columns:
+    1.5fr
+    1fr
+    1fr;
+
+  gap: 28px;
+}
+
+
+/* =========================
+   Search Fields
+========================= */
+
+.search-field {
+  display: flex;
+  flex-direction: column;
+
+  gap: 10px;
+}
+
+.search-field label {
+  font-size: 16px;
+  font-weight: 600;
+
+  color: #1e293b;
+}
+
+.search-field input,
+.search-field select {
+  width: 100%;
+  height: 52px;
+
+  padding: 0 16px;
+
+  box-sizing: border-box;
+
+  border: 1px solid #cbd5e1;
+
+  border-radius: 12px;
+
+  background: #ffffff;
+
+  color: #0f172a;
+
+  font-size: 16px;
+
+  outline: none;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.search-field input::placeholder {
+  color: #94a3b8;
+}
+
+
+/* Input focus */
+
+.search-field input:focus,
+.search-field select:focus {
+  border-color: #2563eb;
+
+  box-shadow:
+    0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+
+/* =========================
+   Available Jobs
+========================= */
+
+.available-jobs {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+
+/* =========================
+   Jobs Heading
+========================= */
+
+.jobs-heading {
+  margin-bottom: 24px;
+
+  text-align: center;
+}
+
+.jobs-heading h2 {
+  margin: 0;
+
+  font-size: 30px;
+  font-weight: 700;
+
+  color: #0f172a;
+}
+
+.jobs-heading p {
+  margin-top: 8px;
+
+  font-size: 17px;
+
+  color: #64748b;
+}
+
+
+/* =========================
+   Job List
+========================= */
+
+.job-list {
+  display: flex;
+  flex-direction: column;
+
+  gap: 20px;
+}
+
+
+/* =========================
+   Job Card
+========================= */
+
+.job-card {
+  position: relative;
+
+  display: grid;
+
+  grid-template-columns:
+    64px
+    1fr
+    auto;
+
+  align-items: center;
+
+  gap: 24px;
+
+  padding: 28px 30px;
+
+  background: #ffffff;
+
+  border: 1px solid #e2e8f0;
+
+  border-radius: 18px;
+
+  box-shadow:
+    0 6px 20px rgba(15, 23, 42, 0.05);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+
+/* Card hover */
+
+.job-card:hover {
+  transform: translateY(-2px);
+
+  border-color: #bfdbfe;
+
+  box-shadow:
+    0 10px 28px rgba(37, 99, 235, 0.10);
+}
+
+
+/* =========================
+   Job Icon
+========================= */
+
+.job-icon {
+  width: 64px;
+  height: 64px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 16px;
+
+  background: #eff6ff;
+
+  color: #2563eb;
+
+  font-size: 27px;
+  font-weight: 700;
+}
+
+
+/* =========================
+   Job Information
+========================= */
+
+.job-info {
+  min-width: 0;
+}
+
+.job-info h3 {
+  margin: 0;
+
+  font-size: 24px;
+  font-weight: 700;
+
+  color: #0f172a;
+}
+
+.company-name {
+  margin: 6px 0 14px;
+
+  font-size: 16px;
+
+  color: #64748b;
+}
+
+
+/* =========================
+   Job Meta
+========================= */
+
+.job-meta {
+  display: flex;
+  align-items: center;
+
+  flex-wrap: wrap;
+
+  gap: 12px;
+}
+
+.job-meta span {
+  display: inline-flex;
+  align-items: center;
+
+  padding: 9px 14px;
+
+  background: #f8fafc;
+
+  border: 1px solid #dbe4ef;
+
+  border-radius: 10px;
+
+  color: #475569;
+
+  font-size: 15px;
+}
+
+
+/* =========================
+   VIEW JOB BUTTON
+========================= */
+
+.view-job-button {
+  display: inline-flex;
+
+  align-items: center;
+  justify-content: center;
+
+  min-width: 125px;
+
+  padding: 12px 20px;
+
+  background: #ffffff;
+
+  color: #2563eb !important;
+
+  border: 1.5px solid #2563eb;
+
+  border-radius: 10px;
+
+  font-size: 16px;
+  font-weight: 600;
+
+  text-decoration: none;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+
+/* View Job - Hover */
+
+.view-job-button:hover {
+  background: #2563eb;
+
+  color: #ffffff !important;
+
+  border-color: #2563eb;
+
+  text-decoration: none;
+
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 7px 18px rgba(37, 99, 235, 0.22);
+}
+
+
+/* View Job - Keyboard Focus */
+
+.view-job-button:focus-visible {
+  background: #2563eb;
+
+  color: #ffffff !important;
+
+  outline: 3px solid #93c5fd;
+
+  outline-offset: 3px;
+}
+
+
+/* View Job - Click */
+
+.view-job-button:active {
+  transform: translateY(0);
+
+  box-shadow: none;
+}
+
+
+/* =========================
+   No Jobs
+========================= */
+
+.no-jobs {
+  padding: 60px 20px;
+
+  text-align: center;
+
+  background: #ffffff;
+
+  border: 1px solid #e2e8f0;
+
+  border-radius: 18px;
+}
+
+.no-jobs h3 {
+  margin: 0;
+
+  font-size: 24px;
+
+  color: #0f172a;
+}
+
+.no-jobs p {
+  margin-top: 8px;
+
+  color: #64748b;
+}
+
+
+/* =========================
+   Tablet
+========================= */
+
+@media (max-width: 900px) {
+
+  .find-jobs-page {
+    padding: 30px 4%;
+  }
+
+  .find-jobs-header {
+    flex-direction: column;
+
+    align-items: flex-start;
+  }
+
+  .job-search-section {
+    grid-template-columns: 1fr;
+  }
+
+  .job-card {
+    grid-template-columns:
+      56px
+      1fr;
+
+    gap: 18px;
+  }
+
+  .view-job-button {
+    grid-column: 2;
+
+    justify-self: start;
+  }
+}
+
+
+/* =========================
+   Mobile
+========================= */
+
+@media (max-width: 600px) {
+
+  .find-jobs-page {
+    padding: 24px 16px;
+  }
+
+  .find-jobs-header {
+    margin-bottom: 30px;
+  }
+
+  .find-jobs-header h1 {
+    font-size: 32px;
+  }
+
+  .find-jobs-header p {
+    font-size: 15px;
+  }
+
+  .back-dashboard {
+    font-size: 15px;
+  }
+
+  .job-search-section {
+    padding: 22px;
+
+    border-radius: 16px;
+
+    gap: 20px;
+  }
+
+  .jobs-heading h2 {
+    font-size: 26px;
+  }
+
+  .job-card {
+    grid-template-columns: 1fr;
+
+    padding: 22px;
+
+    text-align: left;
+  }
+
+  .job-icon {
+    width: 54px;
+    height: 54px;
+
+    font-size: 22px;
+  }
+
+  .job-info h3 {
+    font-size: 21px;
+  }
+
+  .job-meta {
+    gap: 8px;
+  }
+
+  .job-meta span {
+    font-size: 14px;
+
+    padding: 8px 10px;
+  }
+
+  .view-job-button {
+    grid-column: auto;
+
+    width: 100%;
+
+    box-sizing: border-box;
+  }
+}

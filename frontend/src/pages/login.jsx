@@ -5,6 +5,11 @@ import "./login.css";
 function Login() {
   const navigate = useNavigate();
 
+
+  // ==============================
+  // Background Images
+  // ==============================
+
   const backgrounds = [
     "/background/bg1.png",
     "/background/bg2.jpg",
@@ -14,74 +19,99 @@ function Login() {
   ];
 
 
+  // Current background
   const [currentBackground, setCurrentBackground] = useState(0);
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
- 
 
-  // Change background every 1 minute
+  // ==============================
+  // Login Form Data
+  // ==============================
+
+  const [email, setEmail] = useState("");
+
+  const [password, setPassword] = useState("");
+const [role, setRole] = useState("candidate");
+
+// ==============================
+// Background Slideshow
+// ==============================
   useEffect(() => {
 
     const interval = setInterval(() => {
 
-      setCurrentBackground((previous) =>
-        (previous + 1) % backgrounds.length
+      setCurrentBackground(
+        (previous) =>
+          (previous + 1) % backgrounds.length
       );
 
     }, 5000);
 
 
+    // Clear interval when component is removed
     return () => clearInterval(interval);
 
   }, []);
 
 
+  // ==============================
+  // Login Function
+  // ==============================
 
   const handleLogin = (e) => {
 
+    // Prevent page refresh
     e.preventDefault();
 
 
+    // Check empty fields
     if (!email || !password) {
 
-      alert("Please enter both email and password.");
+      alert(
+        "Please enter both email and password."
+      );
 
       return;
     }
 
 
+    // Basic email validation
     if (!email.includes("@")) {
 
-      alert("Please enter a valid email address.");
+      alert(
+        "Please enter a valid email address."
+      );
 
       return;
     }
 
 
     alert("Login successful!");
-     navigate("/home");
-
-
-    console.log("Email:", email);
-    console.log("Password:", password);
+    navigate("/home");
 
   };
 
 
+  // ==============================
+  // UI
+  // ==============================
 
   return (
 
     <div
       className="login-page"
+
       style={{
-        backgroundImage: `url(${backgrounds[currentBackground]})`
+        backgroundImage:
+          `url(${backgrounds[currentBackground]})`
       }}
     >
 
-
       <div className="login-container">
 
+
+        {/* ============================== */}
+        {/* Header */}
+        {/* ============================== */}
 
         <div className="login-header">
 
@@ -89,21 +119,21 @@ function Login() {
             JobRecruit
           </h1>
 
-
           <p>
             Job Recruitment & Applicant Tracking System
           </p>
 
-
         </div>
 
 
+        {/* ============================== */}
+        {/* Login Form */}
+        {/* ============================== */}
 
         <form
           className="login-form"
           onSubmit={handleLogin}
         >
-
 
           <h2>
             Welcome Back!
@@ -115,13 +145,17 @@ function Login() {
           </p>
 
 
+          {/* ============================== */}
+          {/* Email */}
+          {/* ============================== */}
 
-          <label>
+          <label htmlFor="email">
             Email Address
           </label>
 
 
           <input
+            id="email"
 
             type="email"
 
@@ -132,17 +166,20 @@ function Login() {
             onChange={(e) =>
               setEmail(e.target.value)
             }
-
           />
 
 
+          {/* ============================== */}
+          {/* Password */}
+          {/* ============================== */}
 
-          <label>
+          <label htmlFor="password">
             Password
           </label>
 
 
           <input
+            id="password"
 
             type="password"
 
@@ -153,10 +190,37 @@ function Login() {
             onChange={(e) =>
               setPassword(e.target.value)
             }
-
           />
 
 
+          {/* ============================== */}
+          {/* Account Type */}
+          {/* ============================== */}
+
+          <label htmlFor="role">
+            Account Type
+          </label>
+
+          <select
+            id="role"
+            value={role}
+            onChange={(e) =>
+              setRole(e.target.value)
+            }
+          >
+            <option value="candidate">
+              Candidate
+            </option>
+
+            <option value="recruiter">
+              Recruiter
+            </option>
+          </select>
+
+
+          {/* ============================== */}
+          {/* Forgot Password */}
+          {/* ============================== */}
 
           <div className="forgot-password">
 
@@ -167,42 +231,39 @@ function Login() {
           </div>
 
 
+          {/* ============================== */}
+          {/* Login Button */}
+          {/* ============================== */}
 
           <button
             type="submit"
             className="login-button"
           >
-
             Login
-
           </button>
 
 
+          {/* ============================== */}
+          {/* Register Navigation */}
+          {/* ============================== */}
 
-<p className="register-text">
+          <p className="register-text">
 
-  Don't have an account?
+            Don't have an account?
 
-  <Link to="/register">
-    Register
-  </Link>
+            <Link to="/register">
+              Register
+            </Link>
 
-</p>
-
-
+          </p>
 
         </form>
 
-
-
       </div>
-
-
 
     </div>
 
   );
-
 }
 
 

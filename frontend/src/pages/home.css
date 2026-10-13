@@ -99,6 +99,20 @@
 
 }
 
+.buttons .admin-portal-link{
+    padding:8px 12px;
+    border:0;
+    background:transparent;
+    color:#667085;
+    cursor:pointer;
+    font-size:14px;
+}
+
+.buttons .admin-portal-link:hover{
+    color:#1465e8;
+    text-decoration:underline;
+}
+
 
 
 .login-btn{
@@ -192,7 +206,7 @@ h1{
 
     font-size:75px;
 
-    line-height:1.15;
+    line-height:1.05;
 
     color:#071525;
 
@@ -332,11 +346,6 @@ h1 span{
 
 }
 
-.dashboard-link {
-    color: #1465e8 !important;
-    font-weight: 600;
-    cursor: pointer;
-}
 
 
 .card h3{

@@ -1,0 +1,17 @@
+.resource-page h1,
+.resource-page h2 {
+  color: #0f172a;
+}
+
+.resource-page h1 {
+  font-weight: 700;
+}
+
+.resource-page h2 {
+  font-weight: 700;
+}
+
+.resource-page ul,
+.resource-page ol {
+  text-align: left;
+}

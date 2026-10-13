@@ -212,7 +212,7 @@ function Register() {
           <p className="login-text">
             Already have an account?
 
-            <Link to="/">
+            <Link to="/login">
               Login
             </Link>
           </p>
