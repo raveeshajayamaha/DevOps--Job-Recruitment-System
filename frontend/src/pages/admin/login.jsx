@@ -1,14 +1,26 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./login.css";
+import { login, logout } from "../../services/authService";
 
 function AdminLogin() {
+  const navigate = useNavigate();
+  const [submitting, setSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [message, setMessage] = useState("");
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
-    setMessage("Authentication is not connected yet. No sign-in was performed.");
+    if (submitting) return;
+    const fields = new FormData(event.currentTarget);
+    setSubmitting(true);
+    setMessage("");
+    try {
+      const user = await login(fields.get("email"), fields.get("password"));
+      if (user.role !== "admin") { logout(); setMessage("An administrator account is required."); }
+      else { navigate("/admin/dashboard", { replace: true }); }
+    } catch (error) { setMessage(error.message); }
+    finally { setSubmitting(false); }
   }
 
   return (
@@ -23,7 +35,7 @@ function AdminLogin() {
         <p className="admin-login-intro">Sign in to manage the recruitment platform.</p>
 
         <div className="admin-login-notice" role="note">
-          Real authentication is not connected yet. This form does not sign you in.
+          Administrator accounts must be provisioned privately. Public registration is for Candidates and Recruiters.
         </div>
 
         <form onSubmit={handleSubmit}>
@@ -62,7 +74,7 @@ function AdminLogin() {
             </div>
           </div>
 
-          <button className="admin-login-submit" type="submit">Sign In</button>
+          <button className="admin-login-submit" type="submit" disabled={submitting}>{submitting ? "Signing In..." : "Sign In"}</button>
           <p className="admin-login-message" role="status" aria-live="polite">{message}</p>
         </form>
       </section>

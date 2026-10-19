@@ -1,5 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
+import ProtectedRoute from "./components/ProtectedRoute";
+
 import Home from "./pages/home";
 import Login from "./pages/login";
 import Register from "./pages/register";
@@ -70,148 +72,147 @@ function App(){
 
         <Route
   path="/dashboard"
-  element={<Dashboard />}
+  element={<ProtectedRoute role="candidate"><Dashboard /></ProtectedRoute>}
 />
 
         {/* Candidate Dashboard */}
         <Route
           path="/candidate/dashboard"
-          element={<Dashboard />}
+          element={<ProtectedRoute role="candidate"><Dashboard /></ProtectedRoute>}
         />
 
         {/* Find Jobs */}
         <Route
           path="/candidate/jobs"
-          element={<FindJobs />}
+          element={<ProtectedRoute role="candidate"><FindJobs /></ProtectedRoute>}
         />
 
         {/* Job Details */}
         <Route
           path="/candidate/jobs/:jobId"
-          element={<JobDetails />}
+          element={<ProtectedRoute role="candidate"><JobDetails /></ProtectedRoute>}
         />
 
         {/* Candidate Profile */}
         <Route
           path="/candidate/profile"
-          element={<Profile />}
+          element={<ProtectedRoute role="candidate"><Profile /></ProtectedRoute>}
         />
 
         {/* Candidate Settings */}
         <Route
           path="/candidate/settings"
-          element={<Settings />}
+          element={<ProtectedRoute role="candidate"><Settings /></ProtectedRoute>}
         />
 
         {/* Candidate Applications */}
         <Route
           path="/candidate/applications"
-          element={<Applications />}
+          element={<ProtectedRoute role="candidate"><Applications /></ProtectedRoute>}
         />
         <Route
           path="/candidate/applications/:applicationId"
-          element={<CandidateApplicationDetails />}
+          element={<ProtectedRoute role="candidate"><CandidateApplicationDetails /></ProtectedRoute>}
         />
 
         {/* Candidate Interviews */}
         <Route
           path="/candidate/interviews"
-          element={<InterviewsPage />}
+          element={<ProtectedRoute role="candidate"><InterviewsPage /></ProtectedRoute>}
         />
 
         {/* Career Resources */}
         <Route
           path="/candidate/resources"
-          element={<ResourcesPage />}
+          element={<ProtectedRoute role="candidate"><ResourcesPage /></ProtectedRoute>}
         />
 
         {/* Resume Builder */}
         <Route
           path="/candidate/resources/resume-builder"
-          element={<ResumeBuilder />}
+          element={<ProtectedRoute role="candidate"><ResumeBuilder /></ProtectedRoute>}
         />
 
         {/* Interview Tips */}
         <Route
           path="/candidate/resources/interview-tips"
-          element={<InterviewTips />}
+          element={<ProtectedRoute role="candidate"><InterviewTips /></ProtectedRoute>}
         />
 
         {/* Recruiter Dashboard */}
         <Route
           path="/recruiter/dashboard"
-          element={<RecruiterDashboard />}
+          element={<ProtectedRoute role="recruiter"><RecruiterDashboard /></ProtectedRoute>}
         />
 
         {/* Recruiter Post Job */}
         <Route
           path="/recruiter/jobs/new"
-          element={<PostJob />}
+          element={<ProtectedRoute role="recruiter"><PostJob /></ProtectedRoute>}
         />
 
         {/* Recruiter Job Details */}
         <Route
           path="/recruiter/jobs/:jobId"
-          element={<RecruiterJobDetails />}
+          element={<ProtectedRoute role="recruiter"><RecruiterJobDetails /></ProtectedRoute>}
         />
 
         {/* Recruiter Edit Job */}
         <Route
           path="/recruiter/jobs/:jobId/edit"
-          element={<EditJob />}
+          element={<ProtectedRoute role="recruiter"><EditJob /></ProtectedRoute>}
         />
 
         {/* Recruiter Manage Jobs */}
         <Route
           path="/recruiter/jobs"
-          element={<ManageJobs />}
+          element={<ProtectedRoute role="recruiter"><ManageJobs /></ProtectedRoute>}
         />
 
         {/* Recruiter Application Details */}
         <Route
           path="/recruiter/applications/:applicationId"
-          element={<RecruiterApplicationDetails />}
+          element={<ProtectedRoute role="recruiter"><RecruiterApplicationDetails /></ProtectedRoute>}
         />
 
         {/* Recruiter Applications */}
         <Route
           path="/recruiter/applications"
-          element={<RecruiterApplications />}
+          element={<ProtectedRoute role="recruiter"><RecruiterApplications /></ProtectedRoute>}
         />
 
         {/* Recruiter Interview Details */}
         <Route
           path="/recruiter/interviews/:interviewId"
-          element={<RecruiterInterviewDetails />}
+          element={<ProtectedRoute role="recruiter"><RecruiterInterviewDetails /></ProtectedRoute>}
         />
 
         {/* Recruiter Schedule Interview */}
         <Route
           path="/recruiter/interviews/schedule/:applicationId"
-          element={<ScheduleInterview />}
+          element={<ProtectedRoute role="recruiter"><ScheduleInterview /></ProtectedRoute>}
         />
 
         {/* Recruiter Interviews */}
         <Route
           path="/recruiter/interviews"
-          element={<RecruiterInterviews />}
+          element={<ProtectedRoute role="recruiter"><RecruiterInterviews /></ProtectedRoute>}
         />
 
         {/* Recruiter Profile */}
         <Route
           path="/recruiter/profile"
-          element={<RecruiterProfile />}
+          element={<ProtectedRoute role="recruiter"><RecruiterProfile /></ProtectedRoute>}
         />
 
         {/* Recruiter Settings */}
         <Route
           path="/recruiter/settings"
-          element={<RecruiterSettings />}
+          element={<ProtectedRoute role="recruiter"><RecruiterSettings /></ProtectedRoute>}
         />
 
         {/* Admin Dashboard */}
-        {/* Preview route only: protect production access with backend authentication and Admin-role authorization. */}
-        <Route path="/admin" element={<AdminThemeProvider />}>
+        <Route path="/admin" element={<ProtectedRoute role="admin"><AdminThemeProvider /></ProtectedRoute>}>
           <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="users" element={<AdminUsers />} />
           <Route path="jobs" element={<AdminJobs />} />

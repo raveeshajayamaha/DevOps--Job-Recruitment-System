@@ -1,12 +1,11 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./register.css";
+import { register } from "../services/authService";
 
 function Register() {
-  const backgrounds = [
-    "/background/bg1.png"
-  
-  ];
+  const navigate = useNavigate();
+  const [submitting, setSubmitting] = useState(false);
 
 
   const [firstName, setFirstName] = useState("");
@@ -17,8 +16,9 @@ function Register() {
   const [role, setRole] = useState("candidate");
 
 
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
+    if (submitting) return;
 
     // Check required fields
     if (
@@ -39,8 +39,8 @@ function Register() {
     }
 
     // Password length validation
-    if (password.length < 6) {
-      alert("Password must be at least 6 characters long.");
+    if (password.length < 8) {
+      alert("Password must be at least 8 characters long.");
       return;
     }
 
@@ -50,12 +50,13 @@ function Register() {
       return;
     }
 
-    alert("Registration form submitted successfully!");
-
-    console.log("First Name:", firstName);
-    console.log("Last Name:", lastName);
-    console.log("Email:", email);
-    console.log("Role:", role);
+    setSubmitting(true);
+    try {
+      const result = await register({ firstName, lastName, email, password, confirmPassword, role });
+      alert(result.message);
+      navigate("/login", { replace: true });
+    } catch (error) { alert(error.message); }
+    finally { setSubmitting(false); }
   };
 
   return (
@@ -203,8 +204,9 @@ function Register() {
           <button
             type="submit"
             className="register-button"
+            disabled={submitting}
           >
-            Create Account
+            {submitting ? "Creating Account..." : "Create Account"}
           </button>
 
 

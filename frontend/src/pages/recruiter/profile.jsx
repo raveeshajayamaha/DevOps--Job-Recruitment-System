@@ -1,3 +1,4 @@
+import { logout } from "../../services/authService";
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { getRecruiterProfile, updateRecruiterProfile } from "../../services/recruiterProfileService";
@@ -120,7 +121,7 @@ function RecruiterSidebar() {
       <nav className="recruiter-navigation" aria-label="Recruiter navigation">
         {sidebarItems.map((item) => <NavLink className={({ isActive }) => `recruiter-nav-link${isActive ? " active" : ""}`} end={item.end} key={item.label} to={item.to}><span className="recruiter-nav-icon">{item.icon}</span><span>{item.label}</span></NavLink>)}
       </nav>
-      <div className="recruiter-sidebar-footer"><NavLink className="recruiter-nav-link" to="/"><span className="recruiter-nav-icon">↪</span><span>Logout</span></NavLink></div>
+      <div className="recruiter-sidebar-footer"><NavLink className="recruiter-nav-link" to="/" onClick={logout}><span className="recruiter-nav-icon">↪</span><span>Logout</span></NavLink></div>
     </aside>
   );
 }

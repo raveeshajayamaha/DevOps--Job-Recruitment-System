@@ -1,3 +1,4 @@
+import { logout } from "../../services/authService";
 import { useMemo, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { getJobs } from "../../services/jobService";
@@ -162,7 +163,7 @@ function RecruiterSidebar() {
         ))}
       </nav>
       <div className="recruiter-sidebar-footer">
-        <NavLink className="recruiter-nav-link" to="/"><span className="recruiter-nav-icon">↪</span><span>Logout</span></NavLink>
+        <NavLink className="recruiter-nav-link" to="/" onClick={logout}><span className="recruiter-nav-icon">↪</span><span>Logout</span></NavLink>
       </div>
     </aside>
   );

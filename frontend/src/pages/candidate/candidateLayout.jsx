@@ -1,3 +1,4 @@
+import { logout } from "../../services/authService";
 import { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import "./dashboard.css";
@@ -57,7 +58,7 @@ function CandidateLayout({ title, eyebrow, children }) {
         </nav>
 
         <div className="sidebar-bottom">
-          <NavLink to="/" className="sidebar-link logout-link">
+          <NavLink to="/" onClick={logout} className="sidebar-link logout-link">
             <span className="nav-icon">↪</span>
             <span>Logout</span>
           </NavLink>

@@ -1,3 +1,4 @@
+import { logout } from "../../services/authService";
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { getRecruiterSettings, resetRecruiterSettings, updateRecruiterSettings } from "../../services/recruiterSettingsService";
@@ -70,7 +71,7 @@ function RecruiterLayout({ children }) {
 }
 
 function RecruiterSidebar() {
-  return <aside className="recruiter-sidebar"><div className="recruiter-brand"><div className="recruiter-brand-logo">💼</div><div><strong>JobRecruit</strong><span>Recruiter Portal</span></div></div><nav className="recruiter-navigation" aria-label="Recruiter navigation">{sidebarItems.map((item) => <NavLink className={({ isActive }) => `recruiter-nav-link${isActive ? " active" : ""}`} end={item.end} key={item.label} to={item.to}><span className="recruiter-nav-icon">{item.icon}</span><span>{item.label}</span></NavLink>)}</nav><div className="recruiter-sidebar-footer"><NavLink className="recruiter-nav-link" to="/"><span className="recruiter-nav-icon">↪</span><span>Logout</span></NavLink></div></aside>;
+  return <aside className="recruiter-sidebar"><div className="recruiter-brand"><div className="recruiter-brand-logo">💼</div><div><strong>JobRecruit</strong><span>Recruiter Portal</span></div></div><nav className="recruiter-navigation" aria-label="Recruiter navigation">{sidebarItems.map((item) => <NavLink className={({ isActive }) => `recruiter-nav-link${isActive ? " active" : ""}`} end={item.end} key={item.label} to={item.to}><span className="recruiter-nav-icon">{item.icon}</span><span>{item.label}</span></NavLink>)}</nav><div className="recruiter-sidebar-footer"><NavLink className="recruiter-nav-link" to="/" onClick={logout}><span className="recruiter-nav-icon">↪</span><span>Logout</span></NavLink></div></aside>;
 }
 
 function HeaderActions() {

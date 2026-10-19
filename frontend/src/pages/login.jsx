@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./login.css";
+import { login, dashboardFor } from "../services/authService";
 
 function Login() {
   const navigate = useNavigate();
@@ -30,6 +31,7 @@ function Login() {
   const [email, setEmail] = useState("");
 
   const [password, setPassword] = useState("");
+const [submitting, setSubmitting] = useState(false);
 const [role, setRole] = useState("candidate");
 
 // ==============================
@@ -57,10 +59,11 @@ const [role, setRole] = useState("candidate");
   // Login Function
   // ==============================
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
 
     // Prevent page refresh
     e.preventDefault();
+    if (submitting) return;
 
 
     // Check empty fields
@@ -85,8 +88,13 @@ const [role, setRole] = useState("candidate");
     }
 
 
-    alert("Login successful!");
-    navigate("/home");
+    setSubmitting(true);
+    try {
+      // Redirect using the verified database role, regardless of the selector.
+      const user = await login(email, password);
+      navigate(dashboardFor(user.role), { replace: true });
+    } catch (error) { alert(error.message); }
+    finally { setSubmitting(false); }
 
   };
 
@@ -238,8 +246,9 @@ const [role, setRole] = useState("candidate");
           <button
             type="submit"
             className="login-button"
+            disabled={submitting}
           >
-            Login
+            {submitting ? "Logging In..." : "Login"}
           </button>
 
 

@@ -1,3 +1,4 @@
+import { logout } from "../../services/authService";
 import { useState } from "react";
 import { NavLink, useParams } from "react-router-dom";
 import { getInterviewById, updateInterviewStatus } from "../../services/interviewService";
@@ -64,7 +65,7 @@ function RecruiterLayout({ children }) {
 
 function RecruiterSidebar() {
   const items = [{ label: "Dashboard", icon: "⌂", to: "/recruiter/dashboard", end: true }, { label: "Post Job", icon: "+", to: "/recruiter/jobs/new", end: true }, { label: "Manage Jobs", icon: "▣", to: "/recruiter/jobs", end: true }, { label: "Applications", icon: "✓", to: "/recruiter/applications" }, { label: "Interviews", icon: "◷", to: "/recruiter/interviews" }, { label: "Profile", icon: "◎", to: "/recruiter/profile" }, { label: "Settings", icon: "⚙", to: "/recruiter/settings" }];
-  return <aside className="recruiter-sidebar"><div className="recruiter-brand"><div className="recruiter-brand-logo">💼</div><div><strong>JobRecruit</strong><span>Recruiter Portal</span></div></div><nav className="recruiter-navigation" aria-label="Recruiter navigation">{items.map((item) => <NavLink className={({ isActive }) => `recruiter-nav-link${isActive ? " active" : ""}`} end={item.end} key={item.label} to={item.to}><span className="recruiter-nav-icon">{item.icon}</span><span>{item.label}</span></NavLink>)}</nav><div className="recruiter-sidebar-footer"><NavLink className="recruiter-nav-link" to="/"><span className="recruiter-nav-icon">↪</span><span>Logout</span></NavLink></div></aside>;
+  return <aside className="recruiter-sidebar"><div className="recruiter-brand"><div className="recruiter-brand-logo">💼</div><div><strong>JobRecruit</strong><span>Recruiter Portal</span></div></div><nav className="recruiter-navigation" aria-label="Recruiter navigation">{items.map((item) => <NavLink className={({ isActive }) => `recruiter-nav-link${isActive ? " active" : ""}`} end={item.end} key={item.label} to={item.to}><span className="recruiter-nav-icon">{item.icon}</span><span>{item.label}</span></NavLink>)}</nav><div className="recruiter-sidebar-footer"><NavLink className="recruiter-nav-link" to="/" onClick={logout}><span className="recruiter-nav-icon">↪</span><span>Logout</span></NavLink></div></aside>;
 }
 
 function DetailSection({ children, title }) { return <section className="interview-detail-section"><h2>{title}</h2><div className="interview-detail-facts">{children}</div></section>; }

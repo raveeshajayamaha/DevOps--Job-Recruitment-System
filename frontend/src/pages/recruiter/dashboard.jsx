@@ -1,3 +1,4 @@
+import { logout } from "../../services/authService";
 import { NavLink } from "react-router-dom";
 import {
   applicationPipeline,
@@ -57,7 +58,7 @@ function RecruiterDashboard() {
         </nav>
 
         <div className="recruiter-sidebar-footer">
-          <NavLink className="recruiter-nav-link" to="/">
+          <NavLink className="recruiter-nav-link" to="/" onClick={logout}>
             <span className="recruiter-nav-icon">↪</span>
             <span>Logout</span>
           </NavLink>

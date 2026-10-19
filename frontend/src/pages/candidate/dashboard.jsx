@@ -1,3 +1,4 @@
+import { logout } from "../../services/authService";
 import { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import "./dashboard.css";
@@ -116,7 +117,7 @@ function Dashboard() {
         <div className="sidebar-bottom">
 
           <NavLink
-            to="/"
+            to="/" onClick={logout}
             className="sidebar-link logout-link"
           >
             <span className="nav-icon">↪</span>
