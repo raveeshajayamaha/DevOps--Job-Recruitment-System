@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import "./login.css";
-import { login, dashboardFor } from "../services/authService";
+import { login } from "../services/authService";
 
 function Login() {
   const navigate = useNavigate();
+  const { state } = useLocation();
 
 
   // ==============================
@@ -52,7 +53,7 @@ const [role, setRole] = useState("candidate");
     // Clear interval when component is removed
     return () => clearInterval(interval);
 
-  }, []);
+  }, [backgrounds.length]);
 
 
   // ==============================
@@ -90,9 +91,9 @@ const [role, setRole] = useState("candidate");
 
     setSubmitting(true);
     try {
-      // Redirect using the verified database role, regardless of the selector.
-      const user = await login(email, password);
-      navigate(dashboardFor(user.role), { replace: true });
+      // The selector is presentation only; the backend authenticates the account.
+      await login(email, password);
+      navigate("/home", { replace: true });
     } catch (error) { alert(error.message); }
     finally { setSubmitting(false); }
 
@@ -152,6 +153,8 @@ const [role, setRole] = useState("candidate");
             Login to your account
           </p>
 
+
+          {state?.message && <p role="alert">{state.message}</p>}
 
           {/* ============================== */}
           {/* Email */}

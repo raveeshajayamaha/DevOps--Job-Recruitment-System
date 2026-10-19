@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { currentUser, dashboardFor, getToken, logout } from '../services/authService';
+import { currentUser, dashboardFor, getToken } from '../services/authService';
 
 export default function ProtectedRoute({ role, children }) {
   const { pathname } = useLocation();
@@ -17,14 +17,13 @@ export default function ProtectedRoute({ role, children }) {
         })
         .catch((error) => {
           if (!active) return;
-          if (error.status === 401) logout();
           setVerification({ pathname, error });
         });
     }
     return () => { active = false; controller.abort(); };
   }, [pathname]);
 
-  if (!getToken()) return <Navigate to={loginPath} replace />;
+  if (!getToken()) return <Navigate to={loginPath} replace state={{ message: verification?.error?.status === 401 ? verification.error.message : undefined }} />;
   if (!verification || verification.pathname !== pathname) {
     return <p role="status">Verifying your session...</p>;
   }
@@ -32,7 +31,7 @@ export default function ProtectedRoute({ role, children }) {
     if (verification.error.status === 401) return <Navigate to={loginPath} replace />;
     return <div role="alert">{verification.error.message} <button onClick={() => window.location.reload()}>Retry</button></div>;
   }
-  if (verification.user.role !== role) {
+  if (role && verification.user.role !== role) {
     return <Navigate to={dashboardFor(verification.user.role)} replace />;
   }
   return children;

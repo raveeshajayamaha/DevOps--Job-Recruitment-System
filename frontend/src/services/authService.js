@@ -5,8 +5,14 @@ export function getToken() {
   return sessionStorage.getItem(TOKEN_KEY);
 }
 
-export function logout() {
+export function logout(event) {
   sessionStorage.removeItem(TOKEN_KEY);
+  // Existing Logout links pass their click event. Keep their UI unchanged.
+  // Calls without an event only clear credentials (also used by admin login).
+  if (event?.preventDefault) {
+    event.preventDefault();
+    window.location.assign('/login');
+  }
 }
 
 export function dashboardFor(role) {
@@ -22,12 +28,16 @@ async function request(path, options = {}) {
   let response;
   try {
     response = await fetch(API_URL + path, options);
-  } catch {
-    throw new Error('Cannot reach the backend. Check that it is running on port 5000.');
+  } catch (error) {
+    if (error.name === 'AbortError') throw error;
+    throw new Error('Cannot reach the backend. Check that it is running on port 5000.', { cause: error });
   }
   const data = await response.json().catch(() => ({}));
-  if (!response.ok) {
-    const error = new Error(data.message || 'Authentication request failed');
+  if (!response.ok || data.success === false) {
+    const message = response.status >= 500
+      ? 'The server could not complete your request. Please try again later.'
+      : data.message || 'Authentication request failed. Please try again.';
+    const error = new Error(message);
     error.status = response.status;
     throw error;
   }
@@ -46,12 +56,31 @@ export async function login(email, password) {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password }),
   });
+  if (typeof data.token !== 'string' || !data.token.trim() || !data.user ||
+      !['candidate', 'recruiter', 'admin'].includes(data.user.role)) {
+    throw new Error('The server returned an incomplete login response. Please try again.');
+  }
   sessionStorage.setItem(TOKEN_KEY, data.token);
   return data.user;
 }
 
-export function currentUser(signal) {
-  return request('/auth/me', {
-    headers: { Authorization: 'Bearer ' + getToken() }, signal,
-  });
+export async function currentUser(signal) {
+  const token = getToken();
+  if (!token) {
+    const error = new Error("Please log in to continue.");
+    error.status = 401;
+    throw error;
+  }
+  try {
+    const data = await request('/auth/me', {
+      headers: { Authorization: 'Bearer ' + token }, signal,
+    });
+    if (!data.user || !['candidate', 'recruiter', 'admin'].includes(data.user.role)) {
+      throw new Error('Unable to verify your session. Please try again.');
+    }
+    return data;
+  } catch (error) {
+    if (error.status === 401 && getToken() === token) logout();
+    throw error;
+  }
 }
