@@ -2,7 +2,7 @@ import { logout } from "../../services/authService";
 import { useState } from "react";
 import { NavLink, useNavigate, useParams } from "react-router-dom";
 import { getApplicationById } from "../../services/applicationService";
-import { getJobById } from "../../services/jobService";
+import sampleJobs from "../../data/recruiterJobs";
 import { createInterview } from "../../services/interviewService";
 import "./dashboard.css";
 import "./interviews.css";
@@ -11,7 +11,7 @@ function ScheduleInterview() {
   const { applicationId } = useParams();
   const navigate = useNavigate();
   const application = getApplicationById(applicationId);
-  const job = application ? getJobById(application.jobId) : undefined;
+  const job = application ? sampleJobs.find((item) => String(item.id) === String(application.jobId)) : undefined;
   const [form, setForm] = useState(() => ({
     interviewDate: "",
     interviewTime: "",

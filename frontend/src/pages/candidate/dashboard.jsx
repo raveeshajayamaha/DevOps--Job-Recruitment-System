@@ -1,9 +1,9 @@
 import { logout } from "../../services/authService";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import "./dashboard.css";
 
-import jobs from "../../data/jobs";
+import { getJobs } from "../../services/jobService";
 import interviews from "../../data/interviews";
 import applications from "../../data/applications";
 import resources from "../../data/resources";
@@ -11,6 +11,15 @@ import resources from "../../data/resources";
 function Dashboard() {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
+  const [jobsResult, setJobsResult] = useState(null);
+  useEffect(() => {
+    const controller = new AbortController();
+    getJobs({}, controller.signal)
+      .then(jobs => setJobsResult({ jobs }))
+      .catch(error => { if (!controller.signal.aborted) setJobsResult({ error }); });
+    return () => controller.abort();
+  }, []);
+  const jobs = jobsResult?.jobs || [];
 
   const handleSearch = (event) => {
     event.preventDefault();
@@ -431,6 +440,8 @@ function Dashboard() {
                 {/* Dynamic Job Cards */}
 
                 <div className="recommended-jobs">
+                  {!jobsResult && <p role="status">Loading jobs...</p>}
+                  {jobsResult?.error && <p role="alert">{jobsResult.error.message}</p>}
 
                   {jobs.slice(0, 3).map((job, index) => (
 

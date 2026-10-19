@@ -1,7 +1,7 @@
 import { logout } from "../../services/authService";
 import { useState } from "react";
 import { NavLink, useParams } from "react-router-dom";
-import { getJobById } from "../../services/jobService";
+import sampleJobs from "../../data/recruiterJobs";
 import { getApplicationById, updateApplicationStatus } from "../../services/applicationService";
 import { getInterviewsByApplicationId } from "../../services/interviewService";
 import "./dashboard.css";
@@ -36,7 +36,7 @@ function RecruiterApplicationDetails() {
     );
   }
 
-  const job = getJobById(application.jobId);
+  const job = sampleJobs.find((item) => String(item.id) === String(application.jobId));
 
   const changeStatus = (status) => {
     const updatedApplication = updateApplicationStatus(application.id, status);

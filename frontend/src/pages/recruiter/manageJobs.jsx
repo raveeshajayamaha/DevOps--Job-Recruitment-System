@@ -1,7 +1,7 @@
 import { logout } from "../../services/authService";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { NavLink } from "react-router-dom";
-import { getJobs } from "../../services/jobService";
+import { getMyJobs } from "../../services/jobService";
 import "./dashboard.css";
 import "./manageJobs.css";
 
@@ -18,7 +18,16 @@ const sidebarItems = [
 function ManageJobs() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
-  const jobs = useMemo(() => getJobs(), []);
+  const [jobsResult, setJobsResult] = useState(null);
+  useEffect(() => {
+    const controller = new AbortController();
+    getMyJobs(controller.signal)
+      .then(jobs => setJobsResult({ jobs }))
+      .catch(error => { if (!controller.signal.aborted) setJobsResult({ error }); });
+    return () => controller.abort();
+  }, []);
+  const jobs = useMemo(() => jobsResult?.jobs || [], [jobsResult]);
+
 
   const summary = useMemo(() => ({
     total: jobs.length,
@@ -66,6 +75,8 @@ function ManageJobs() {
         </header>
 
         <div className="recruiter-content">
+          {!jobsResult && <p role="status">Loading jobs...</p>}
+          {jobsResult?.error && <p role="alert">{jobsResult.error.message}</p>}
           <div className="recruiter-content-toolbar manage-jobs-toolbar">
             <div>
               <h2>Your job postings</h2>
@@ -110,7 +121,7 @@ function ManageJobs() {
               </div>
             </div>
 
-            {filteredJobs.length > 0 ? (
+            {!jobsResult || jobsResult.error ? null : filteredJobs.length > 0 ? (
               <div className="manage-jobs-list">
                 {filteredJobs.map((job) => (
                   <article className="manage-job-row" key={job.id}>

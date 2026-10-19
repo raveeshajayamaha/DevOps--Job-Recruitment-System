@@ -1,65 +1,71 @@
-import recruiterJobs from "../data/recruiterJobs";
+import { getToken, logout } from './authService';
 
-let jobs = recruiterJobs;
-
-function getJobs() {
-  return jobs.map((job) => ({ ...job, requirements: [...job.requirements], skills: [...job.skills] }));
+const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api').replace(/\/$/, '');
+const editableFields = ['title', 'company', 'location', 'jobType', 'salaryMin', 'salaryMax', 'experienceLevel', 'description', 'requirements', 'skills', 'deadline', 'status'];
+function payload(data) {
+  return Object.fromEntries(editableFields.filter(key => Object.hasOwn(data, key)).map(key => [key, data[key]]));
 }
-
-function getJobById(id) {
-  return getJobs().find((job) => String(job.id) === String(id));
-}
-
-function createJob(jobData) {
-  const newJob = {
-    ...jobData,
-    id: jobData.id ?? getNextJobId(),
-    status: jobData.status ?? "active",
-    applicantsCount: jobData.applicantsCount ?? 0,
-    requirements: [...(jobData.requirements ?? [])],
-    skills: [...(jobData.skills ?? [])],
+function normalize(job) {
+  return {
+    ...job,
+    id: job.id || job._id,
+    type: ({ 'Full-time': 'Full Time', 'Part-time': 'Part Time' })[job.jobType] || job.jobType,
+    salary: `Rs. ${job.salaryMin / 1000}K - ${job.salaryMax / 1000}K`,
   };
-
-  jobs = [...jobs, newJob];
-  return { ...newJob, requirements: [...newJob.requirements], skills: [...newJob.skills] };
 }
-
-function updateJob(id, updatedData) {
-  const job = getJobById(id);
-
-  if (!job) {
-    return undefined;
+async function request(path, { method = 'GET', body, signal } = {}) {
+  const token = getToken();
+  if (!token) {
+    const error = new Error('Please log in to continue.');
+    error.status = 401;
+    window.location.assign('/login');
+    throw error;
   }
-
-  const updatedJob = { ...job, ...updatedData, id: job.id };
-  jobs = jobs.map((currentJob) => (currentJob.id === job.id ? updatedJob : currentJob));
-  return { ...updatedJob, requirements: [...updatedJob.requirements], skills: [...updatedJob.skills] };
-}
-
-function deleteJob(id) {
-  const job = getJobById(id);
-
-  if (!job) {
-    return false;
+  let response;
+  try {
+    response = await fetch(API_URL + '/jobs' + path, {
+      method, signal,
+      headers: { Authorization: `Bearer ${token}`, ...(body ? { 'Content-Type': 'application/json' } : {}) },
+      ...(body ? { body: JSON.stringify(body) } : {}),
+    });
+  } catch (error) {
+    if (error.name === 'AbortError') throw error;
+    throw new Error('Cannot reach the backend. Check that it is running on port 5000.', { cause: error });
   }
-
-  jobs = jobs.filter((currentJob) => currentJob.id !== job.id);
-  return true;
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok || data.success === false) {
+    if (response.status === 401 && getToken() === token) {
+      logout();
+      window.location.assign('/login');
+    }
+    const error = new Error(response.status >= 500 ? 'Unable to complete the job request. Please try again later.' : data.message || 'Unable to complete the job request.');
+    error.status = response.status;
+    throw error;
+  }
+  return data;
 }
-
-function updateJobStatus(id, status) {
-  return updateJob(id, { status });
+export async function getJobs(filters = {}, signal) {
+  const query = new URLSearchParams(Object.entries(filters).filter(([, value]) => value && value !== 'All Types'));
+  const data = await request(`?${query}`, { signal });
+  return data.jobs.map(normalize);
 }
-
-function getNextJobId() {
-  return jobs.reduce((highestId, job) => Math.max(highestId, Number(job.id) || 0), 0) + 1;
+export async function getMyJobs(signal) {
+  const data = await request('/my', { signal });
+  return data.jobs.map(normalize);
 }
-
-export {
-  createJob,
-  deleteJob,
-  getJobById,
-  getJobs,
-  updateJob,
-  updateJobStatus,
-};
+export async function getJobById(id, signal) {
+  const data = await request('/' + encodeURIComponent(id), { signal });
+  return normalize(data.job);
+}
+export async function createJob(data) {
+  return normalize((await request('', { method: 'POST', body: payload(data) })).job);
+}
+export async function updateJob(id, data) {
+  return normalize((await request('/' + encodeURIComponent(id), { method: 'PUT', body: payload(data) })).job);
+}
+export function deleteJob(id) {
+  return request('/' + encodeURIComponent(id), { method: 'DELETE' });
+}
+export async function updateJobStatus(id, status) {
+  return normalize((await request('/' + encodeURIComponent(id) + '/status', { method: 'PATCH', body: { status } })).job);
+}

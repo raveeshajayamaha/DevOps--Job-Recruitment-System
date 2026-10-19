@@ -1,12 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { getJobs } from "../../services/jobService";
+import sampleJobs from "../../data/recruiterJobs";
 import AdminSidebar from "./AdminSidebar";
 import { useAdminTheme } from "./AdminThemeContext";
 import "./dashboard.css";
 import "./jobs.css";
 
 const PAGE_SIZE = 5;
-const sampleJobs = getJobs();
 const statuses = [...new Set(sampleJobs.map((job) => job.status))];
 const jobTypes = [...new Set(sampleJobs.map((job) => job.jobType))];
 

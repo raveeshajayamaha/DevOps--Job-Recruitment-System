@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { logout } from "../../services/authService";
 import { NavLink, useParams } from "react-router-dom";
 import { getJobById } from "../../services/jobService";
@@ -16,7 +17,16 @@ const sidebarItems = [
 
 function RecruiterJobDetails() {
   const { jobId } = useParams();
-  const job = getJobById(jobId);
+  const [result, setResult] = useState(null);
+  useEffect(() => {
+    const controller = new AbortController();
+    getJobById(jobId, controller.signal)
+      .then(job => setResult({ jobId, job }))
+      .catch(error => { if (!controller.signal.aborted) setResult({ jobId, error }); });
+    return () => controller.abort();
+  }, [jobId]);
+  const loading = !result || result.jobId !== jobId;
+  const job = loading ? null : result.job;
 
   return (
     <div className="recruiter-dashboard recruiter-job-details-page">
@@ -45,7 +55,7 @@ function RecruiterJobDetails() {
         </header>
 
         <div className="recruiter-content">
-          {job ? <JobContent job={job} /> : <JobNotFound />}
+          {loading ? <p role="status">Loading job...</p> : result.error && result.error.status !== 404 ? <p role="alert">{result.error.message}</p> : job ? <JobContent job={job} /> : <JobNotFound />}
         </div>
       </main>
     </div>

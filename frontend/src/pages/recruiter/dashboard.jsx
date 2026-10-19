@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { logout } from "../../services/authService";
 import { NavLink } from "react-router-dom";
 import {
@@ -7,7 +8,7 @@ import {
   recruitmentActivity,
   upcomingInterviews,
 } from "../../data/recruiterDashboard";
-import { getJobs } from "../../services/jobService";
+import { getMyJobs } from "../../services/jobService";
 import "./dashboard.css";
 
 const sidebarItems = [
@@ -21,7 +22,16 @@ const sidebarItems = [
 ];
 
 function RecruiterDashboard() {
-  const activeJobs = getJobs()
+  const [jobsResult, setJobsResult] = useState(null);
+  useEffect(() => {
+    const controller = new AbortController();
+    getMyJobs(controller.signal)
+      .then(jobs => setJobsResult({ jobs }))
+      .catch(error => { if (!controller.signal.aborted) setJobsResult({ error }); });
+    return () => controller.abort();
+  }, []);
+  const jobs = jobsResult?.jobs || [];
+  const activeJobs = jobs
     .filter((job) => job.status === "active")
     .map((job) => ({
       ...job,
@@ -88,6 +98,8 @@ function RecruiterDashboard() {
         </header>
 
         <div className="recruiter-content">
+          {!jobsResult && <p role="status">Loading jobs...</p>}
+          {jobsResult?.error && <p role="alert">{jobsResult.error.message}</p>}
           <div className="recruiter-content-toolbar">
             <div>
               <h2>Recruitment at a glance</h2>

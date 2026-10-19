@@ -1,5 +1,5 @@
 import { logout } from "../../services/authService";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { NavLink, useNavigate, useParams } from "react-router-dom";
 import { getJobById, updateJob } from "../../services/jobService";
 import "./postJob.css";
@@ -32,8 +32,18 @@ const sidebarItems = [
 function EditJob() {
   const { jobId } = useParams();
   const navigate = useNavigate();
-  const job = getJobById(jobId);
-  const [form, setForm] = useState(() => job ? toForm(job) : emptyForm);
+  const [result, setResult] = useState(null);
+  const [form, setForm] = useState(emptyForm);
+  const [submitting, setSubmitting] = useState(false);
+  useEffect(() => {
+    const controller = new AbortController();
+    getJobById(jobId, controller.signal)
+      .then(job => { if (!controller.signal.aborted) { setResult({ jobId, job }); setForm(toForm(job)); } })
+      .catch(error => { if (!controller.signal.aborted) setResult({ jobId, error }); });
+    return () => controller.abort();
+  }, [jobId]);
+  const loading = !result || result.jobId !== jobId;
+  const job = loading ? null : result.job;
   const [errors, setErrors] = useState({});
   const [success, setSuccess] = useState("");
 
@@ -51,8 +61,8 @@ function EditJob() {
           </header>
           <div className="post-job-content">
             <div className="post-job-card edit-job-not-found" role="alert">
-              <strong>Job not found</strong>
-              <span>The requested job posting could not be found.</span>
+              <strong>{loading ? "Loading job..." : "Unable to load job"}</strong>
+              <span>{loading ? "Please wait while we load the job." : result.error?.message || "Job not found."}</span>
               <NavLink className="post-job-primary-button" to="/recruiter/jobs">
                 Back to Manage Jobs
               </NavLink>
@@ -75,8 +85,9 @@ function EditJob() {
     setSuccess("");
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
+    if (submitting) return;
     const nextErrors = validateForm(form);
     setErrors(nextErrors);
 
@@ -85,14 +96,14 @@ function EditJob() {
       return;
     }
 
-    const updatedJob = updateJob(jobId, toJobData(form, job));
-    if (!updatedJob) {
-      setErrors({ form: "Unable to update this job. Please try again." });
-      return;
-    }
-
-    setSuccess("Job updated successfully. Returning to Job Details...");
-    window.setTimeout(() => navigate(`/recruiter/jobs/${jobId}`), 600);
+    setSubmitting(true);
+    setSuccess("");
+    try {
+      await updateJob(jobId, toJobData(form));
+      setSuccess("Job updated successfully. Returning to Job Details...");
+      navigate(`/recruiter/jobs/${jobId}`);
+    } catch (error) { setErrors({ form: error.message }); }
+    finally { setSubmitting(false); }
   };
 
   return (
@@ -191,7 +202,7 @@ function EditJob() {
               <button className="post-job-secondary-button" onClick={() => navigate(`/recruiter/jobs/${jobId}`)} type="button">
                 Cancel
               </button>
-              <button className="post-job-primary-button" type="submit">Save Changes</button>
+              <button className="post-job-primary-button" type="submit" disabled={submitting}>{submitting ? "Saving..." : "Save Changes"}</button>
             </div>
           </form>
         </div>
@@ -216,7 +227,7 @@ function toForm(job) {
   };
 }
 
-function toJobData(form, job) {
+function toJobData(form) {
   return {
     title: form.title.trim(),
     company: form.company.trim(),
@@ -229,9 +240,6 @@ function toJobData(form, job) {
     requirements: splitList(form.requirements),
     skills: splitList(form.skills),
     deadline: form.deadline,
-    status: job.status,
-    applicantsCount: job.applicantsCount,
-    postedDate: job.postedDate,
   };
 }
 

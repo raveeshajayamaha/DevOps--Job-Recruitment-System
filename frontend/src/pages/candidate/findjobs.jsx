@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { jobs } from "../../data/jobs";
+import { getJobs } from "../../services/jobService";
 
 import "./findjobs.css";
 
@@ -11,22 +11,21 @@ function FindJobs() {
   const [location, setLocation] = useState("");
   const [jobType, setJobType] = useState("All Types");
 
-  const filteredJobs = jobs.filter((job) => {
-    const searchText = search.trim().toLowerCase();
-
-    const matchesSearch =
-      job.title.toLowerCase().includes(searchText) ||
-      job.company.toLowerCase().includes(searchText);
-
-    const matchesLocation =
-      location === "" ||
-      job.location.toLowerCase().includes(location.toLowerCase());
-
-    const matchesType =
-      jobType === "All Types" || job.type === jobType;
-
-    return matchesSearch && matchesLocation && matchesType;
-  });
+  const [result, setResult] = useState(null);
+  useEffect(() => {
+    const controller = new AbortController();
+    const timer = setTimeout(() => {
+      getJobs({ search, location, jobType }, controller.signal)
+        .then(jobs => setResult({ search, location, jobType, jobs }))
+        .catch(error => {
+          if (!controller.signal.aborted) setResult({ search, location, jobType, error });
+        });
+    }, 250);
+    return () => { clearTimeout(timer); controller.abort(); };
+  }, [search, location, jobType]);
+  const loading = !result || result.search !== search || result.location !== location || result.jobType !== jobType;
+  const error = !loading && result.error;
+  const filteredJobs = loading || error ? [] : result.jobs;
 
   return (
     <div className="find-jobs-page">
@@ -99,7 +98,7 @@ function FindJobs() {
         <div className="jobs-heading">
           <div>
             <h2>Available Jobs</h2>
-            <p>{filteredJobs.length} jobs found</p>
+            <p>{loading ? "Loading jobs..." : `${filteredJobs.length} jobs found`}</p>
           </div>
         </div>
 
@@ -107,7 +106,7 @@ function FindJobs() {
         {/* Job Cards */}
         <div className="job-list">
 
-          {filteredJobs.length > 0 ? (
+          {loading ? <p role="status">Loading jobs...</p> : error ? <p role="alert">{error.message}</p> : filteredJobs.length > 0 ? (
 
             filteredJobs.map((job) => (
 

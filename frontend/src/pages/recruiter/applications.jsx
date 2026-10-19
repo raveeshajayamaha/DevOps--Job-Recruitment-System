@@ -1,7 +1,7 @@
 import { logout } from "../../services/authService";
 import { useMemo, useState } from "react";
 import { NavLink } from "react-router-dom";
-import { getJobs } from "../../services/jobService";
+import sampleJobs from "../../data/recruiterJobs";
 import { getApplications } from "../../services/applicationService";
 import "./dashboard.css";
 import "./applications.css";
@@ -18,7 +18,7 @@ const sidebarItems = [
 
 function RecruiterApplications() {
   const applications = useMemo(() => getApplications(), []);
-  const jobs = useMemo(() => getJobs(), []);
+  const jobs = useMemo(() => sampleJobs, []);
   const [searchTerm, setSearchTerm] = useState("");
   const [jobFilter, setJobFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");

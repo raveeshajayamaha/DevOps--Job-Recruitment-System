@@ -1,5 +1,6 @@
 import { Link, useParams } from "react-router-dom";
-import jobs from "../../data/jobs";
+import { useEffect, useState } from "react";
+import { getJobById } from "../../services/jobService";
 import "./jobDetails.css";
 
 
@@ -7,11 +8,17 @@ function JobDetails() {
 
   const { jobId } = useParams();
 
-  // Find the selected job using the ID from the URL
-  const job = jobs.find(
-    (job) => job.id === Number(jobId)
-  );
-
+  const [result, setResult] = useState(null);
+  useEffect(() => {
+    const controller = new AbortController();
+    getJobById(jobId, controller.signal)
+      .then(job => setResult({ jobId, job }))
+      .catch(error => { if (!controller.signal.aborted) setResult({ jobId, error }); });
+    return () => controller.abort();
+  }, [jobId]);
+  const loading = !result || result.jobId !== jobId;
+  const job = loading ? null : result.job;
+  const error = !loading && result.error;
 
   // If job does not exist
   if (!job) {
@@ -27,10 +34,10 @@ function JobDetails() {
 
         <div className="job-section">
 
-          <h2>Job Not Found</h2>
+          <h2>{loading ? "Loading job..." : error?.status === 404 ? "Job Not Found" : "Unable to load job"}</h2>
 
           <p>
-            The job you are looking for does not exist.
+            {loading ? "Please wait while we load the job." : error?.message || "The job you are looking for does not exist."}
           </p>
 
         </div>

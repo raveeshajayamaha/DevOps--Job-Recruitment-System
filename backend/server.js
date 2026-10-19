@@ -4,6 +4,7 @@ import cors from 'cors';
 import mongoose from 'mongoose';
 import { fileURLToPath } from 'node:url';
 import authRoutes from './routes/auth.js';
+import jobRoutes from './routes/jobs.js';
 import User from './models/User.js';
 import { connectDB } from './config/db.js';
 
@@ -28,6 +29,7 @@ app.get('/api/test', (req, res) => {
 });
 
 app.use('/api/auth', authRoutes);
+app.use('/api/jobs', jobRoutes);
 
 app.use((req, res) => {
   res.status(404).json({ success: false, message: 'Endpoint not found' });

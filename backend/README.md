@@ -1,4 +1,4 @@
-# JobRecruit backend authentication
+# JobRecruit backend
 
 Requires Node.js, npm, and local MongoDB. From the project root, start the backend:
 
@@ -42,8 +42,8 @@ Use the frontend origin configured in FRONTEND_URL.
    confirmPassword is validated but never saved. The Indexes tab includes
    the unique email_1 index.
 5. Open http://localhost:5173/login and enter the registered email and password.
-   The saved database role selects /candidate/dashboard or /recruiter/dashboard,
-   regardless of the login Account Type selector.
+   Successful login opens /home. Protected job pages use the verified database
+   role regardless of the login Account Type selector.
 6. Existing Candidate and Recruiter Logout links clear the browser session.
    JWTs expire after one hour; closing the browser tab clears session storage.
    Expired tokens redirect to login when a protected route is checked.
@@ -93,9 +93,74 @@ and JWT secret as the test configuration.
 
 ## Remaining scope
 
-Jobs, Applications and Interviews remain frontend sample data; no APIs were added.
+Job management is connected to MongoDB. Applications, Interviews and Admin Job
+Management remain sample screens; their APIs are outside this task.
 Password reset, email verification, rate limiting, refresh tokens and server-side
 token revocation are not implemented. Logout removes the token from sessionStorage;
 an already copied token remains valid until expiry. Session storage is readable
 by JavaScript, so production deployment requires XSS hardening and HTTPS, or a
 dedicated secure-cookie session design.
+
+
+## Job management
+
+Jobs are stored in the MongoDB `jobs` collection. The Job model includes title,
+company, location, jobType, salaries, experienceLevel, description, requirement
+and skill arrays, status, applicantsCount, postedDate, deadline, recruiter and
+createdAt/updatedAt timestamps. Applicants start at zero; ownership and postedDate
+are server-controlled. Identical job titles are allowed; MongoDB IDs identify jobs.
+
+All job endpoints require the existing Bearer JWT:
+
+| Method | Path | Access |
+| --- | --- | --- |
+| GET | /api/jobs | Active jobs; filters: search (title/company), location, jobType |
+| GET | /api/jobs/my | Current recruiter's jobs, including closed jobs |
+| GET | /api/jobs/:jobId | Candidates: active jobs; recruiters: own jobs |
+| POST | /api/jobs | Recruiters only; owner comes from authenticated account |
+| PUT | /api/jobs/:jobId | Owning recruiter only |
+| PATCH | /api/jobs/:jobId/status | Owning recruiter; active or closed |
+| DELETE | /api/jobs/:jobId | Owning recruiter only |
+
+Lists return `{success:true,jobs:[...]}` and create/read/update return
+`{success:true,job:{...}}`. Job responses include both `id` and `_id`, with
+postedDate/deadline as YYYY-MM-DD. The frontend service derives the existing
+candidate `type` and formatted `salary` display fields. No live job page uses
+fixture fallback storage.
+
+The existing forms remain at /recruiter/jobs/new and /recruiter/jobs/:jobId/edit.
+Manage Jobs at /recruiter/jobs loads only the signed-in recruiter's jobs and
+calculates its summaries from those records. Candidate search and detail views
+load MongoDB jobs. Search is debounced and filtered on the server. API errors
+appear within the existing layouts; invalid sessions clear the JWT and open login.
+The recruiter dashboard's job list loads owned jobs, and candidate dashboard
+recommendations load active jobs, without changing either layout. Other dashboard
+metrics remain their existing samples.
+
+Manual check: log in as recruiter, publish a job, open Manage Jobs, refresh,
+view/edit the job, and refresh again. Then log in as candidate and search by title,
+company, location and job type, open View Job, and confirm its details. Apply Now
+remains a visual control; no Application API is implemented. Logout must prevent
+access to recruiter job routes. A second recruiter must receive access denied
+when opening the first recruiter's job edit URL.
+
+Run repeatable API, MongoDB and frontend service tests with the backend running:
+
+```powershell
+cd backend
+npm run test:jobs
+```
+
+For optional browser form tests using headless Microsoft Edge, install Playwright
+in a temporary folder (no project dependency changes):
+
+```powershell
+npm install --prefix "$env:TEMP/jobrecruit-browser-check" --no-package-lock playwright
+$env:JOB_BROWSER_MODULE = "$env:TEMP/jobrecruit-browser-check/node_modules/playwright/index.mjs"
+npm run test:jobs
+```
+
+Both backend and frontend must be running. The tests create unique candidate and
+recruiter accounts and remove only their own jobs/accounts in finally. JOB_TEST_URL
+and JOB_TEST_FRONTEND_URL override the default localhost URLs; the API must use
+the same database and JWT secret as backend/.env.

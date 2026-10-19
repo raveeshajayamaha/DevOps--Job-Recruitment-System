@@ -23,6 +23,7 @@ function PostJob() {
   const [form, setForm] = useState(initialForm);
   const [errors, setErrors] = useState({});
   const [submittedJob, setSubmittedJob] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -102,8 +103,9 @@ function PostJob() {
     return nextErrors;
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
+    if (submitting) return;
 
     const nextErrors = validateForm();
     setErrors(nextErrors);
@@ -113,24 +115,27 @@ function PostJob() {
       return;
     }
 
-    const job = createJob({
-      title: form.title.trim(),
-      company: form.company.trim(),
-      location: form.location.trim(),
-      jobType: form.type === "Full Time" ? "Full-time" : form.type,
-      salaryMin: form.salaryMinimum ? Number(form.salaryMinimum) : 0,
-      salaryMax: form.salaryMaximum ? Number(form.salaryMaximum) : 0,
-      experienceLevel: form.experienceLevel,
-      description: form.description.trim(),
-      requirements: splitList(form.requirements),
-      skills: splitList(form.skills),
-      status: "active",
-      applicantsCount: 0,
-      postedDate: new Date().toISOString().slice(0, 10),
-      deadline: form.deadline,
-    });
+    setSubmitting(true);
+    setSubmittedJob(null);
+    try {
+      const job = await createJob({
+        title: form.title.trim(),
+        company: form.company.trim(),
+        location: form.location.trim(),
+        jobType: ({ "Full Time": "Full-time", "Part Time": "Part-time" })[form.type] || form.type,
+        salaryMin: form.salaryMinimum ? Number(form.salaryMinimum) : 0,
+        salaryMax: form.salaryMaximum ? Number(form.salaryMaximum) : 0,
+        experienceLevel: form.experienceLevel,
+        description: form.description.trim(),
+        requirements: splitList(form.requirements),
+        skills: splitList(form.skills),
+        status: "active",
+        deadline: form.deadline,
+      });
 
-    setSubmittedJob(job);
+      setSubmittedJob(job);
+    } catch (error) { setErrors({ form: error.message }); }
+    finally { setSubmitting(false); }
   };
 
   return (
@@ -348,6 +353,7 @@ function PostJob() {
               </FormField>
             </div>
 
+            {errors.form && <p className="post-job-form-error" role="alert">{errors.form}</p>}
             {submittedJob && (
               <div className="post-job-success" role="status">
                 <strong>Job posted successfully!</strong>
@@ -366,8 +372,8 @@ function PostJob() {
               >
                 Cancel
               </button>
-              <button className="post-job-primary-button" type="submit">
-                Publish Job
+              <button className="post-job-primary-button" type="submit" disabled={submitting}>
+                {submitting ? "Publishing..." : "Publish Job"}
               </button>
             </div>
           </form>
