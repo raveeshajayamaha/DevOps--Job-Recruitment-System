@@ -1,7 +1,7 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import CandidateLayout from "./candidateLayout";
-import applications from "../../data/applications";
+import { getMyApplications } from "../../services/applicationService";
 import "./applications.css";
 
 const statusOptions = ["All", "Pending", "Shortlisted", "Interview", "Rejected"];
@@ -14,6 +14,15 @@ const statusClassNames = {
 };
 
 function Applications() {
+  const [result, setResult] = useState(null);
+  useEffect(() => {
+    const controller = new AbortController();
+    getMyApplications(controller.signal)
+      .then(applications => setResult({ applications: applications.map(application => ({ ...application, status: application.status.charAt(0).toUpperCase() + application.status.slice(1) })) }))
+      .catch(error => { if (!controller.signal.aborted) setResult({ error }); });
+    return () => controller.abort();
+  }, []);
+  const applications = useMemo(() => result?.applications || [], [result]);
   const [statusFilter, setStatusFilter] = useState("All");
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -30,7 +39,7 @@ function Applications() {
 
       return matchesStatus && matchesSearch;
     });
-  }, [searchTerm, statusFilter]);
+  }, [applications, searchTerm, statusFilter]);
 
   const getStatusCount = (status) =>
     applications.filter((application) => application.status === status).length;
@@ -86,7 +95,7 @@ function Applications() {
             </div>
           </div>
 
-          {filteredApplications.length === 0 ? (
+          {!result ? <p role="status">Loading applications...</p> : result.error ? <p role="alert">{result.error.message}</p> : filteredApplications.length === 0 ? (
             <div className="applications-empty-state">
               <div className="empty-state-icon">📄</div>
               <h3>No applications found.</h3>

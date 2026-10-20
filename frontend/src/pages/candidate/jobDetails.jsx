@@ -1,6 +1,8 @@
 import { Link, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { getJobById } from "../../services/jobService";
+import { createApplication } from "../../services/applicationService";
+import { useRef } from "react";
 import "./jobDetails.css";
 
 
@@ -8,6 +10,20 @@ function JobDetails() {
 
   const { jobId } = useParams();
 
+  const applying = useRef(false);
+  const [submission, setSubmission] = useState(null);
+  const currentSubmission = submission?.jobId === jobId ? submission : null;
+  const applyNow = async () => {
+    if (applying.current || currentSubmission?.applied) return;
+    applying.current = true;
+    setSubmission({ jobId, pending: true });
+    try {
+      await createApplication(jobId);
+      setSubmission({ jobId, applied: true, message: "Application submitted successfully." });
+    } catch (error) {
+      setSubmission({ jobId, applied: error.status === 409, error: true, message: error.message });
+    } finally { applying.current = false; }
+  };
   const [result, setResult] = useState(null);
   useEffect(() => {
     const controller = new AbortController();
@@ -172,9 +188,10 @@ function JobDetails() {
 
       <div className="apply-section">
 
-        <button className="apply-button">
-          Apply Now
+        <button className="apply-button" onClick={applyNow} disabled={currentSubmission?.pending || currentSubmission?.applied}>
+          {currentSubmission?.pending ? "Applying..." : currentSubmission?.applied ? "Applied" : "Apply Now"}
         </button>
+        {currentSubmission?.message && <p role={currentSubmission.error ? "alert" : "status"}>{currentSubmission.message}</p>}
 
       </div>
 

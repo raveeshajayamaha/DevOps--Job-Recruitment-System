@@ -5,6 +5,8 @@ import mongoose from 'mongoose';
 import { fileURLToPath } from 'node:url';
 import authRoutes from './routes/auth.js';
 import jobRoutes from './routes/jobs.js';
+import applicationRoutes from './routes/applications.js';
+import Application from './models/Application.js';
 import User from './models/User.js';
 import { connectDB } from './config/db.js';
 
@@ -30,6 +32,7 @@ app.get('/api/test', (req, res) => {
 
 app.use('/api/auth', authRoutes);
 app.use('/api/jobs', jobRoutes);
+app.use('/api/applications', applicationRoutes);
 
 app.use((req, res) => {
   res.status(404).json({ success: false, message: 'Endpoint not found' });
@@ -55,6 +58,7 @@ async function startServer() {
   if (!process.env.JWT_SECRET || Buffer.byteLength(process.env.JWT_SECRET) < 32) throw new Error('JWT_SECRET must contain at least 32 bytes');
   await connectDB();
   await User.init();
+  await Application.init();
   const server = app.listen(port, () => {
     console.info(`JobRecruit backend running at http://localhost:${port}`);
   });

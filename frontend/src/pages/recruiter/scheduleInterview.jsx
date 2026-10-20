@@ -1,8 +1,7 @@
 import { logout } from "../../services/authService";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { NavLink, useNavigate, useParams } from "react-router-dom";
 import { getApplicationById } from "../../services/applicationService";
-import sampleJobs from "../../data/recruiterJobs";
 import { createInterview } from "../../services/interviewService";
 import "./dashboard.css";
 import "./interviews.css";
@@ -10,8 +9,18 @@ import "./interviews.css";
 function ScheduleInterview() {
   const { applicationId } = useParams();
   const navigate = useNavigate();
-  const application = getApplicationById(applicationId);
-  const job = application ? sampleJobs.find((item) => String(item.id) === String(application.jobId)) : undefined;
+  const [result, setResult] = useState(null);
+  useEffect(() => {
+    const controller = new AbortController();
+    getApplicationById(applicationId, controller.signal)
+      .then(application => setResult({ applicationId, application }))
+      .catch(error => { if (!controller.signal.aborted) setResult({ applicationId, error }); });
+    return () => controller.abort();
+  }, [applicationId]);
+  const loading = !result || result.applicationId !== applicationId;
+  const application = loading ? null : result.application;
+  const loadError = !loading && result.error;
+
   const [form, setForm] = useState(() => ({
     interviewDate: "",
     interviewTime: "",
@@ -21,8 +30,10 @@ function ScheduleInterview() {
   }));
   const [errors, setErrors] = useState({});
 
+  if (loading) return <RecruiterLayout><p role="status">Loading application...</p></RecruiterLayout>;
+
   if (!application) {
-    return <RecruiterLayout><ScheduleState title="Application not found" message="The requested application could not be found." /></RecruiterLayout>;
+    return <RecruiterLayout><ScheduleState title="Application not found" message={loadError?.message || "The requested application could not be found."} /></RecruiterLayout>;
   }
 
   if (application.status !== "shortlisted") {
@@ -66,7 +77,7 @@ function ScheduleInterview() {
       <section className="recruiter-card schedule-card">
         <div className="schedule-heading"><h2>Schedule Interview</h2><p>Create an interview for this shortlisted candidate.</p></div>
         <div className="schedule-candidate">
-          <strong>{application.candidateName}</strong><span>{application.email} · {application.jobTitle} at {job?.company || application.company}</span>
+          <strong>{application.candidateName}</strong><span>{application.email} · {application.jobTitle} at {application.company}</span>
         </div>
         <form className="schedule-form" onSubmit={saveInterview}>
           <FormField error={errors.interviewDate} label="Interview date"><input aria-label="Interview date" min="2026-01-01" onChange={(event) => updateField("interviewDate", event.target.value)} type="date" value={form.interviewDate} /></FormField>

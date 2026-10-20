@@ -1,8 +1,8 @@
 import { logout } from "../../services/authService";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { NavLink } from "react-router-dom";
-import sampleJobs from "../../data/recruiterJobs";
-import { getApplications } from "../../services/applicationService";
+import { getMyJobs } from "../../services/jobService";
+import { getRecruiterApplications } from "../../services/applicationService";
 import "./dashboard.css";
 import "./applications.css";
 
@@ -17,8 +17,16 @@ const sidebarItems = [
 ];
 
 function RecruiterApplications() {
-  const applications = useMemo(() => getApplications(), []);
-  const jobs = useMemo(() => sampleJobs, []);
+  const [result, setResult] = useState(null);
+  useEffect(() => {
+    const controller = new AbortController();
+    Promise.all([getRecruiterApplications(controller.signal), getMyJobs(controller.signal)])
+      .then(([applications, jobs]) => setResult({ applications, jobs }))
+      .catch(error => { if (!controller.signal.aborted) setResult({ error }); });
+    return () => controller.abort();
+  }, []);
+  const applications = useMemo(() => result?.applications || [], [result]);
+  const jobs = result?.jobs || [];
   const [searchTerm, setSearchTerm] = useState("");
   const [jobFilter, setJobFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -89,12 +97,13 @@ function RecruiterApplications() {
                   <option value="all">All Status</option>
                   <option value="pending">Pending</option>
                   <option value="shortlisted">Shortlisted</option>
+                  <option value="interview">Interview</option>
                   <option value="rejected">Rejected</option>
                 </select>
               </label>
             </div>
 
-            {filteredApplications.length > 0 ? (
+            {!result ? <p role="status">Loading applications...</p> : result.error ? <p role="alert">{result.error.message}</p> : filteredApplications.length > 0 ? (
               <div className="applications-list">
                 {filteredApplications.map((application) => (
                   <article className="application-row" key={application.id}>

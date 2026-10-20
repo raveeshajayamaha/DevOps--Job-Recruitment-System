@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { getApplications } from "../../services/applicationService";
+import sampleApplications from "../../data/recruiterApplications";
 import AdminSidebar from "./AdminSidebar";
 import { useAdminTheme } from "./AdminThemeContext";
 import "./dashboard.css";
@@ -7,7 +7,6 @@ import "./applications.css";
 
 const PAGE_SIZE = 6;
 const supportedStatuses = ["pending", "shortlisted", "rejected"];
-const sampleApplications = getApplications();
 
 function formatDate(value, options = { year: "numeric", month: "short", day: "numeric" }) {
   if (!value) return "Not provided";

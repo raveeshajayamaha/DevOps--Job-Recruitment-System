@@ -1,7 +1,6 @@
 import { logout } from "../../services/authService";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { NavLink, useParams } from "react-router-dom";
-import sampleJobs from "../../data/recruiterJobs";
 import { getApplicationById, updateApplicationStatus } from "../../services/applicationService";
 import { getInterviewsByApplicationId } from "../../services/interviewService";
 import "./dashboard.css";
@@ -19,31 +18,48 @@ const sidebarItems = [
 
 function RecruiterApplicationDetails() {
   const { applicationId } = useParams();
-  const [application, setApplication] = useState(() => getApplicationById(applicationId));
+  const [result, setResult] = useState(null);
+  useEffect(() => {
+    const controller = new AbortController();
+    getApplicationById(applicationId, controller.signal)
+      .then(application => setResult({ applicationId, application }))
+      .catch(error => { if (!controller.signal.aborted) setResult({ applicationId, error }); });
+    return () => controller.abort();
+  }, [applicationId]);
+  const loading = !result || result.applicationId !== applicationId;
+  const application = loading ? null : result.application;
+  const loadError = !loading && result.error;
+  const [updating, setUpdating] = useState(false);
+  const [updateError, setUpdateError] = useState("");
   const [feedback, setFeedback] = useState("");
   const applicationInterviews = application ? getInterviewsByApplicationId(application.id) : [];
   const existingInterview = applicationInterviews[0];
+
+  if (loading) return <ApplicationLayout><p role="status">Loading application...</p></ApplicationLayout>;
 
   if (!application) {
     return (
       <ApplicationLayout>
         <section className="recruiter-card application-not-found" role="alert">
-          <strong>Application not found</strong>
-          <span>The requested application could not be found.</span>
+          <strong>{loadError?.status === 404 ? "Application not found" : "Unable to load application"}</strong>
+          <span>{loadError?.message || "The requested application could not be found."}</span>
           <NavLink className="recruiter-primary-button" to="/recruiter/applications">Back to Applications</NavLink>
         </section>
       </ApplicationLayout>
     );
   }
 
-  const job = sampleJobs.find((item) => String(item.id) === String(application.jobId));
-
-  const changeStatus = (status) => {
-    const updatedApplication = updateApplicationStatus(application.id, status);
-    if (updatedApplication) {
-      setApplication(updatedApplication);
+  const changeStatus = async (status) => {
+    if (updating) return;
+    setUpdating(true);
+    setUpdateError("");
+    setFeedback("");
+    try {
+      const updatedApplication = await updateApplicationStatus(application.id, status);
+      setResult({ applicationId, application: updatedApplication });
       setFeedback(`Application ${status === "shortlisted" ? "shortlisted" : "rejected"} successfully.`);
-    }
+    } catch (error) { setUpdateError(error.message); }
+    finally { setUpdating(false); }
   };
 
   return (
@@ -67,8 +83,8 @@ function RecruiterApplicationDetails() {
           <DetailSection title="Applied Job">
             <DetailFact label="Job Title" value={application.jobTitle} />
             <DetailFact label="Company" value={application.company} />
-            <DetailFact label="Location" value={job?.location || "—"} />
-            <DetailFact label="Job Type" value={job?.jobType || "—"} />
+            <DetailFact label="Location" value={application.location || "—"} />
+            <DetailFact label="Job Type" value={application.jobType || "—"} />
             <DetailFact label="Application Date" value={formatDate(application.appliedDate)} />
           </DetailSection>
         </section>
@@ -82,10 +98,10 @@ function RecruiterApplicationDetails() {
           </div>
           <div className="application-actions">
             {application.status !== "shortlisted" && (
-              <button className="application-shortlist-button" onClick={() => changeStatus("shortlisted")} type="button">Shortlist</button>
+              <button className="application-shortlist-button" disabled={updating} onClick={() => changeStatus("shortlisted")} type="button">Shortlist</button>
             )}
             {application.status !== "rejected" && (
-              <button className="application-reject-button" onClick={() => changeStatus("rejected")} type="button">Reject</button>
+              <button className="application-reject-button" disabled={updating} onClick={() => changeStatus("rejected")} type="button">Reject</button>
             )}
           </div>
           {application.status === "shortlisted" && existingInterview && (
@@ -101,6 +117,7 @@ function RecruiterApplicationDetails() {
           {application.status !== "shortlisted" && application.status !== "rejected" && (
             <p className="application-schedule-note">Shortlist this candidate to schedule an interview.</p>
           )}
+          {updateError && <p role="alert">{updateError}</p>}
           {feedback && <div className="post-job-success" role="status"><strong>{feedback}</strong></div>}
         </section>
       </div>
@@ -152,7 +169,7 @@ function DetailSection({ children, title }) {
 }
 
 function DetailFact({ label, value }) {
-  return <div className="application-detail-fact"><span>{label}</span><strong>{value}</strong></div>;
+  return <div className="application-detail-fact"><span>{label}</span><strong>{value || "Not provided"}</strong></div>;
 }
 
 function formatDate(value) {

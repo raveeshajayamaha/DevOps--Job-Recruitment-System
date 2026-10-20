@@ -1,15 +1,22 @@
+import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import CandidateLayout from "./candidateLayout";
-import applications from "../../data/applications";
+import { getApplicationById } from "../../services/applicationService";
 import "./applications.css";
 
 function CandidateApplicationDetails() {
   const { applicationId } = useParams();
-  const normalizedApplicationId = String(applicationId ?? "").trim();
-  const application = applications.find(
-    (currentApplication) =>
-      String(currentApplication.id).trim() === normalizedApplicationId,
-  );
+  const [result, setResult] = useState(null);
+  useEffect(() => {
+    const controller = new AbortController();
+    getApplicationById(applicationId, controller.signal)
+      .then(application => setResult({ applicationId, application }))
+      .catch(error => { if (!controller.signal.aborted) setResult({ applicationId, error }); });
+    return () => controller.abort();
+  }, [applicationId]);
+  const loading = !result || result.applicationId !== applicationId;
+  const application = loading ? null : result.application;
+  const loadError = !loading && result.error;
   const statusClassName = application?.status
     ? application.status.toLowerCase().replace(/\s+/g, "-")
     : "pending";
@@ -19,10 +26,10 @@ function CandidateApplicationDetails() {
       title="Application Details"
       eyebrow="Candidate applications"
     >
-      {!application ? (
+      {loading ? <p role="status">Loading application...</p> : !application ? (
         <section className="candidate-card applications-empty-state" role="alert">
-          <h3>Application not found.</h3>
-          <p>The requested application could not be found.</p>
+          <h3>{loadError?.status === 404 ? "Application not found." : "Unable to load application."}</h3>
+          <p>{loadError?.message || "The requested application could not be found."}</p>
           <Link className="application-view-job" to="/candidate/applications">
             Back to Applications
           </Link>
@@ -38,7 +45,7 @@ function CandidateApplicationDetails() {
               <p>{application.company}</p>
             </div>
             <span className={`application-status ${statusClassName}`}>
-              {application.status}
+              {application.status.charAt(0).toUpperCase() + application.status.slice(1)}
             </span>
           </div>
           <div className="application-meta">
