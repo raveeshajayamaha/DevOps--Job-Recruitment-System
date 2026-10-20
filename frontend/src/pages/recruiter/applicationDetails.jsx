@@ -32,7 +32,15 @@ function RecruiterApplicationDetails() {
   const [updating, setUpdating] = useState(false);
   const [updateError, setUpdateError] = useState("");
   const [feedback, setFeedback] = useState("");
-  const applicationInterviews = application ? getInterviewsByApplicationId(application.id) : [];
+  const [interviewResult, setInterviewResult] = useState(null);
+  useEffect(() => {
+    const controller = new AbortController();
+    getInterviewsByApplicationId(applicationId, controller.signal)
+      .then(interviews => setInterviewResult({ applicationId, interviews }))
+      .catch(error => { if (!controller.signal.aborted) setInterviewResult({ applicationId, error }); });
+    return () => controller.abort();
+  }, [applicationId]);
+  const applicationInterviews = interviewResult?.applicationId === applicationId ? interviewResult.interviews || [] : [];
   const existingInterview = applicationInterviews[0];
 
   if (loading) return <ApplicationLayout><p role="status">Loading application...</p></ApplicationLayout>;
@@ -117,6 +125,8 @@ function RecruiterApplicationDetails() {
           {application.status !== "shortlisted" && application.status !== "rejected" && (
             <p className="application-schedule-note">Shortlist this candidate to schedule an interview.</p>
           )}
+          {(!interviewResult || interviewResult.applicationId !== applicationId) && <p role="status">Loading interviews...</p>}
+          {interviewResult?.applicationId === applicationId && interviewResult.error && <p role="alert">{interviewResult.error.message}</p>}
           {updateError && <p role="alert">{updateError}</p>}
           {feedback && <div className="post-job-success" role="status"><strong>{feedback}</strong></div>}
         </section>

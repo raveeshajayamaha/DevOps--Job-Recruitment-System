@@ -1,5 +1,5 @@
 import { logout } from "../../services/authService";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { getInterviews } from "../../services/interviewService";
 import "./dashboard.css";
@@ -16,7 +16,14 @@ const sidebarItems = [
 ];
 
 function RecruiterInterviews() {
-  const interviews = useMemo(() => getInterviews(), []);
+  const [result, setResult] = useState(null);
+  useEffect(() => {
+    const controller = new AbortController();
+    getInterviews(controller.signal).then(interviews => setResult({ interviews }))
+      .catch(error => { if (!controller.signal.aborted) setResult({ error }); });
+    return () => controller.abort();
+  }, []);
+  const interviews = useMemo(() => result?.interviews || [], [result]);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
@@ -70,7 +77,7 @@ function RecruiterInterviews() {
             </select>
           </label>
         </div>
-        {filteredInterviews.length > 0 ? (
+        {!result ? <p role="status">Loading interviews...</p> : result.error ? <p role="alert">{result.error.message}</p> : filteredInterviews.length > 0 ? (
           <div className="interviews-list">
             {filteredInterviews.map((interview) => (
               <article className="interview-row" key={interview.id}>

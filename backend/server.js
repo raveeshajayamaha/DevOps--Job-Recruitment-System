@@ -6,6 +6,8 @@ import { fileURLToPath } from 'node:url';
 import authRoutes from './routes/auth.js';
 import jobRoutes from './routes/jobs.js';
 import applicationRoutes from './routes/applications.js';
+import interviewRoutes from './routes/interviews.js';
+import Interview, { InterviewRound } from './models/Interview.js';
 import Application from './models/Application.js';
 import User from './models/User.js';
 import { connectDB } from './config/db.js';
@@ -33,6 +35,7 @@ app.get('/api/test', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/jobs', jobRoutes);
 app.use('/api/applications', applicationRoutes);
+app.use('/api/interviews', interviewRoutes);
 
 app.use((req, res) => {
   res.status(404).json({ success: false, message: 'Endpoint not found' });
@@ -59,6 +62,8 @@ async function startServer() {
   await connectDB();
   await User.init();
   await Application.init();
+  await Interview.init();
+  await InterviewRound.init();
   const server = app.listen(port, () => {
     console.info(`JobRecruit backend running at http://localhost:${port}`);
   });

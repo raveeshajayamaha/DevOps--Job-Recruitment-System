@@ -1,5 +1,5 @@
 import { logout } from "../../services/authService";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { NavLink, useParams } from "react-router-dom";
 import { getInterviewById, updateInterviewStatus } from "../../services/interviewService";
 import "./dashboard.css";
@@ -7,19 +7,34 @@ import "./interviews.css";
 
 function RecruiterInterviewDetails() {
   const { interviewId } = useParams();
-  const [interview, setInterview] = useState(() => getInterviewById(interviewId));
+  const [result, setResult] = useState(null);
+  const [updating, setUpdating] = useState(false);
+  const [updateError, setUpdateError] = useState('');
+  useEffect(() => {
+    const controller = new AbortController();
+    getInterviewById(interviewId, controller.signal).then(interview => setResult({ interviewId, interview }))
+      .catch(error => { if (!controller.signal.aborted) setResult({ interviewId, error }); });
+    return () => controller.abort();
+  }, [interviewId]);
+  const loading = !result || result.interviewId !== interviewId;
+  const interview = loading ? null : result.interview;
   const [feedback, setFeedback] = useState("");
 
+  if (loading) return <RecruiterLayout><p role="status">Loading interview...</p></RecruiterLayout>;
+
   if (!interview) {
-    return <RecruiterLayout><InterviewState title="Interview not found" message="The requested interview could not be found." /></RecruiterLayout>;
+    return <RecruiterLayout><InterviewState title="Interview not found" message={result.error?.message || "The requested interview could not be found."} /></RecruiterLayout>;
   }
 
-  const changeStatus = (status) => {
-    const updatedInterview = updateInterviewStatus(interview.id, status);
-    if (updatedInterview) {
-      setInterview(updatedInterview);
-      setFeedback(`Interview marked as ${formatStatus(status).toLowerCase()}.`);
-    }
+  const changeStatus = async (status) => {
+    if (updating) return;
+    setUpdating(true); setUpdateError(''); setFeedback('');
+    try {
+      const updated = await updateInterviewStatus(interview.id, status);
+      setResult({ interviewId, interview: updated });
+      setFeedback('Interview marked as ' + status + '.');
+    } catch (error) { setUpdateError(error.message); }
+    finally { setUpdating(false); }
   };
 
   return (
@@ -43,15 +58,17 @@ function RecruiterInterviewDetails() {
         </section>
         <section className="recruiter-card interview-status-card">
           <h2>Interview Information</h2>
+          <DetailFact label="Round" value={interview.round} />
           <DetailFact label="Date" value={formatDate(interview.interviewDate)} />
           <DetailFact label="Time" value={formatTime(interview.interviewTime)} />
           <DetailFact label="Type" value={interview.interviewType} />
           <DetailFact label="Meeting Link" value={interview.meetingLink || "Not applicable"} />
           <DetailFact label="Notes" value={interview.notes || "No notes added"} />
           <div className="interview-actions">
-            {interview.status !== "completed" && <button className="application-shortlist-button" onClick={() => changeStatus("completed")} type="button">Mark Completed</button>}
-            {interview.status !== "cancelled" && <button className="application-reject-button" onClick={() => changeStatus("cancelled")} type="button">Cancel Interview</button>}
+            {interview.status !== "completed" && <button className="application-shortlist-button" disabled={updating} onClick={() => changeStatus("completed")} type="button">Mark Completed</button>}
+            {interview.status !== "cancelled" && <button className="application-reject-button" disabled={updating} onClick={() => changeStatus("cancelled")} type="button">Cancel Interview</button>}
           </div>
+          {updateError && <p role="alert">{updateError}</p>}
           {feedback && <div className="post-job-success" role="status"><strong>{feedback}</strong></div>}
         </section>
       </div>

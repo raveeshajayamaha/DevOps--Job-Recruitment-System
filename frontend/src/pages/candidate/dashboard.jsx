@@ -4,7 +4,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import "./dashboard.css";
 
 import { getJobs } from "../../services/jobService";
-import interviews from "../../data/interviews";
+import { getMyInterviews } from "../../services/interviewService";
 import applications from "../../data/applications";
 import resources from "../../data/resources";
 
@@ -20,6 +20,14 @@ function Dashboard() {
     return () => controller.abort();
   }, []);
   const jobs = jobsResult?.jobs || [];
+  const [interviewResult, setInterviewResult] = useState(null);
+  useEffect(() => {
+    const controller = new AbortController();
+    getMyInterviews(controller.signal).then(interviews => setInterviewResult({ interviews }))
+      .catch(error => { if (!controller.signal.aborted) setInterviewResult({ error }); });
+    return () => controller.abort();
+  }, []);
+  const interviews = interviewResult?.interviews || [];
 
   const handleSearch = (event) => {
     event.preventDefault();
@@ -32,7 +40,7 @@ function Dashboard() {
     navigate(url);
   };
 
-  const displayedInterviews = interviews.slice(0, 2);
+  const displayedInterviews = interviews.filter(interview => interview.status === "Upcoming").slice(0, 2);
   const displayedApplications = applications.slice(0, 3);
   const displayedResources = resources.slice(0, 2);
 
@@ -361,7 +369,7 @@ function Dashboard() {
                   <div className="stat-content">
 
                     <strong>
-                      3
+                      {interviewResult?.interviews ? interviews.length : "-"}
                     </strong>
 
                     <span>
@@ -605,18 +613,18 @@ function Dashboard() {
 
                 </div>
 
-                {displayedInterviews.map((interview) => (
+                {!interviewResult ? <p role="status">Loading interviews...</p> : interviewResult.error ? <p role="alert">{interviewResult.error.message}</p> : displayedInterviews.length === 0 ? <p>No interviews scheduled.</p> : displayedInterviews.map((interview) => (
                   <NavLink
                     key={interview.id}
                     to="/candidate/interviews"
                     className="interview-item"
                   >
                     <div className="interview-icon">
-                      {interview.type === "Technical" ? "🎥" : interview.type === "HR" ? "👥" : "🧩"}
+                      {interview.interviewType === "Video Call" ? "🎥" : interview.interviewType === "In-person" ? "👥" : "🧩"}
                     </div>
 
                     <div className="interview-info">
-                      <strong>{interview.title}</strong>
+                      <strong>{interview.jobTitle}</strong>
                       <span>{interview.company}</span>
                       <small>
                         📅 {interview.date} &nbsp; 🕐 {interview.time}

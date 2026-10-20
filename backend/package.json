@@ -8,7 +8,8 @@
     "dev": "nodemon server.js",
     "test:auth": "node scripts/test-auth.js",
     "test:jobs": "node scripts/test-jobs.js",
-    "test:applications": "node scripts/test-applications.js"
+    "test:applications": "node scripts/test-applications.js",
+    "test:interviews": "node scripts/test-interviews.js"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",

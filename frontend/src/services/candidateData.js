@@ -1,5 +1,5 @@
 import jobs from "../data/jobs";
-import interviews from "../data/interviews";
+import { getMyInterviews } from "./interviewService";
 import applications from "../data/applications";
 import resources from "../data/resources";
 
@@ -32,7 +32,7 @@ export function getRecommendedJobs(limit = 3) {
 }
 
 export function getInterviews() {
-  return interviews;
+  return getMyInterviews();
 }
 
 export function getApplications() {

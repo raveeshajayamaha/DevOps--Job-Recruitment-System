@@ -29,6 +29,8 @@ function ScheduleInterview() {
     notes: "",
   }));
   const [errors, setErrors] = useState({});
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState("");
 
   if (loading) return <RecruiterLayout><p role="status">Loading application...</p></RecruiterLayout>;
 
@@ -45,8 +47,10 @@ function ScheduleInterview() {
     setErrors((currentErrors) => ({ ...currentErrors, [field]: "" }));
   };
 
-  const saveInterview = (event) => {
+  const saveInterview = async (event) => {
     event.preventDefault();
+    if (saving) return;
+    setSaveError("");
     const nextErrors = {};
     if (!form.interviewDate) nextErrors.interviewDate = "Interview date is required.";
     if (!form.interviewTime) nextErrors.interviewTime = "Interview time is required.";
@@ -58,17 +62,12 @@ function ScheduleInterview() {
       return;
     }
 
-    const interview = createInterview({
-      applicationId: application.id,
-      candidateId: application.candidateId,
-      jobId: application.jobId,
-      candidateName: application.candidateName,
-      candidateEmail: application.email,
-      jobTitle: application.jobTitle,
-      company: application.company,
-      ...form,
-    });
-    navigate(`/recruiter/interviews/${interview.id}`);
+    setSaving(true);
+    try {
+      const interview = await createInterview({ applicationId: application.id, ...form });
+      navigate('/recruiter/interviews/' + interview.id);
+    } catch (error) { setSaveError(error.message); }
+    finally { setSaving(false); }
   };
 
   return (
@@ -85,7 +84,8 @@ function ScheduleInterview() {
           <FormField error={errors.interviewType} label="Interview type"><select aria-label="Interview type" onChange={(event) => updateField("interviewType", event.target.value)} value={form.interviewType}><option>Video Call</option><option>Phone Call</option><option>In-person</option></select></FormField>
           <FormField error={errors.meetingLink} label="Meeting link"><input aria-label="Meeting link" onChange={(event) => updateField("meetingLink", event.target.value)} placeholder="https://..." type="url" value={form.meetingLink} /></FormField>
           <FormField error={errors.notes} label="Notes"><textarea aria-label="Interview notes" onChange={(event) => updateField("notes", event.target.value)} placeholder="Add notes for the interview..." rows="5" value={form.notes} /></FormField>
-          <div className="schedule-actions"><NavLink className="edit-job-cancel" to={`/recruiter/applications/${application.id}`}>Cancel</NavLink><button className="recruiter-primary-button" type="submit">Schedule Interview</button></div>
+          {saveError && <p role="alert">{saveError}</p>}
+          <div className="schedule-actions"><NavLink className="edit-job-cancel" to={`/recruiter/applications/${application.id}`}>Cancel</NavLink><button className="recruiter-primary-button" disabled={saving} type="submit">{saving ? "Scheduling..." : "Schedule Interview"}</button></div>
         </form>
       </section>
     </RecruiterLayout>

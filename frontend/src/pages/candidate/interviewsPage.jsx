@@ -1,7 +1,7 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import CandidateLayout from "./candidateLayout";
-import interviews from "../../data/interviews";
+import { getMyInterviews } from "../../services/interviewService";
 import "./interviews.css";
 
 const filterOptions = ["All", "Upcoming", "Completed", "Cancelled"];
@@ -13,6 +13,14 @@ const statusClassNames = {
 };
 
 function InterviewsPage() {
+  const [result, setResult] = useState(null);
+  useEffect(() => {
+    const controller = new AbortController();
+    getMyInterviews(controller.signal).then(interviews => setResult({ interviews }))
+      .catch(error => { if (!controller.signal.aborted) setResult({ error }); });
+    return () => controller.abort();
+  }, []);
+  const interviews = useMemo(() => result?.interviews || [], [result]);
   const [statusFilter, setStatusFilter] = useState("All");
 
   const filteredInterviews = useMemo(
@@ -21,7 +29,7 @@ function InterviewsPage() {
         (interview) =>
           statusFilter === "All" || interview.status === statusFilter
       ),
-    [statusFilter]
+    [interviews, statusFilter]
   );
 
   const getStatusCount = (status) =>
@@ -69,7 +77,7 @@ function InterviewsPage() {
             </label>
           </div>
 
-          {filteredInterviews.length === 0 ? (
+          {!result ? <p role="status">Loading interviews...</p> : result.error ? <p role="alert">{result.error.message}</p> : filteredInterviews.length === 0 ? (
             <div className="interviews-empty-state">
               <div className="interview-empty-icon">📅</div>
               <h3>No interviews found.</h3>
@@ -122,7 +130,7 @@ function InterviewCard({ interview }) {
           <span><strong>Date:</strong> {interview.date}</span>
           <span><strong>Time:</strong> {interview.time}</span>
           <span>
-            <strong>{interview.mode === "Online" ? "Online Interview" : "On-site Interview"}:</strong>{" "}
+            <strong>{interview.interviewType === "Phone Call" ? "Phone Interview" : interview.mode === "Online" ? "Online Interview" : "On-site Interview"}:</strong>{" "}
             {interview.location}
           </span>
           <span><strong>Interviewer:</strong> {interview.interviewer}</span>
