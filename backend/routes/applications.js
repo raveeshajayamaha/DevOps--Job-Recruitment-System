@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { recordActivity } from '../utils/activity.js';
 import mongoose from 'mongoose';
 import Application, { applicationStatuses } from '../models/Application.js';
 import Job from '../models/Job.js';
@@ -8,7 +9,7 @@ const router = Router();
 router.use(authenticate);
 router.use((req, res, next) => { res.set('Cache-Control', 'no-store'); next(); });
 const validId = value => typeof value === 'string' && /^[a-f\d]{24}$/i.test(value) && mongoose.isValidObjectId(value);
-const populated = query => query.populate('candidate', 'firstName lastName email').populate('job', 'title company location jobType recruiter');
+const populated = query => query.populate('candidate', 'firstName lastName email profile').populate('job', 'title company location jobType recruiter');
 const dateOnly = value => value?.toISOString().slice(0, 10) || '';
 function serialize(application) {
   const { candidate, job } = application;
@@ -18,7 +19,7 @@ function serialize(application) {
     email: candidate?.email || '', jobTitle: job?.title || 'Job no longer available',
     company: job?.company || '', location: job?.location || '', jobType: job?.jobType || '',
     status: application.status, appliedDate: dateOnly(application.appliedDate), lastUpdated: dateOnly(application.lastUpdated),
-    experience: '', skills: [], resume: '',
+    experience: candidate?.profile?.experience || '', skills: (candidate?.profile?.skills || '').split(',').map(value => value.trim()).filter(Boolean), resume: '',
   };
 }
 function owns(req, application) {
@@ -33,8 +34,16 @@ router.post('/', authorize('candidate'), async (req, res, next) => {
     if (!job) return res.status(404).json({ success: false, message: 'Job not found' });
     if (job.status !== 'active') return res.status(400).json({ success: false, message: 'This job is no longer accepting applications.' });
     const application = await Application.create({ candidate: req.user._id, job: job._id });
+    try {
+      const result = await Job.updateOne({ _id: job._id }, { $inc: { applicantsCount: 1 } });
+      if (result.matchedCount !== 1) throw new Error('Related job disappeared');
+    } catch (error) {
+      await Application.deleteOne({ _id: application._id });
+      throw error;
+    }
+    await recordActivity(req.user, 'Application submitted', 'Application', 'Application', application._id, job.title);
     await application.populate([
-      { path: 'candidate', select: 'firstName lastName email' },
+      { path: 'candidate', select: 'firstName lastName email profile' },
       { path: 'job', select: 'title company location jobType recruiter' },
     ]);
     res.status(201).json({ success: true, message: 'Application submitted successfully.', application: serialize(application) });
@@ -76,6 +85,7 @@ router.patch('/:applicationId/status', authorize('recruiter'), async (req, res, 
     if (!applicationStatuses.includes(req.body?.status)) return res.status(400).json({ success: false, message: 'Status must be pending, shortlisted, interview, or rejected' });
     application.status = req.body.status;
     await application.save();
+    await recordActivity(req.user, 'Application status updated', 'Application', 'Application', application._id, application.status);
     res.json({ success: true, message: 'Application status updated.', application: serialize(application) });
   } catch (error) { next(error); }
 });

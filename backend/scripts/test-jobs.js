@@ -7,6 +7,7 @@ import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken';
 import Job from '../models/Job.js';
 import User from '../models/User.js';
+import ActivityLog from '../models/ActivityLog.js';
 
 dotenv.config({ path: new URL('../.env', import.meta.url), quiet: true });
 const base = process.env.JOB_TEST_URL || 'http://localhost:5000/api';
@@ -212,6 +213,10 @@ try {
   console.log(`PASS: ${checks} job checks (MongoDB persistence, CRUD, filters, role/ownership security, JWT, real frontend service${process.env.JOB_BROWSER_MODULE ? ', and browser forms/navigation' : ''}).`);
 } finally {
   if (browser) await browser.close();
+  if (mongoose.connection.readyState === 1) {
+    const testUsers = await User.find({ email: { $in: emails } }).select('_id');
+    await ActivityLog.deleteMany({ actor: { $in: testUsers.map(user => user._id) } });
+  }
   if (mongoose.connection.readyState === 1) {
     // Restrict cleanup to accounts and jobs created by this unique test run.
     await Job.deleteMany({ recruiter: { $in: userIds } });

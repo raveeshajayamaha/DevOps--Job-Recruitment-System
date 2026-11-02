@@ -1,3 +1,5 @@
+> Historical design proposal: this document predates the implemented backend. The current API uses `/api` (not `/api/v1`), MongoDB IDs, and Bearer JWT authentication. See [BACKEND_API.md](BACKEND_API.md) for the implemented contract. Statements below about missing endpoints describe the earlier frontend-only snapshot.
+
 # API Contract: DevOps-Enabled Job Recruitment & Applicant Tracking System
 
 **Status:** Proposed contract for future backend implementation

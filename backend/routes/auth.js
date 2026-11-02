@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import bcrypt from 'bcrypt';
+import { recordActivity } from '../utils/activity.js';
 import User from '../models/User.js';
 import { authenticate } from '../middleware/auth.js';
 import { publicUser, signToken } from '../utils/auth.js';
@@ -42,6 +43,7 @@ router.post('/register', async (req, res, next) => {
       firstName: firstName.trim(), lastName: lastName.trim(), email: normalizedEmail,
       password: hash, role,
     });
+    await recordActivity(user, 'Account registered', 'User', 'User', user._id);
     // Registration saves the account; login is a separate step.
     res.status(201).json({ success: true, message: 'Account created. Please log in.', user: publicUser(user) });
   } catch (err) {
@@ -62,10 +64,11 @@ router.post('/login', async (req, res, next) => {
     return res.status(400).json({ success: false, message: 'Enter a valid email and password' });
   }
   try {
-    const user = await User.findOne({ email: email.trim().toLowerCase() }).select('+password');
+    const user = await User.findOne({ email: email.trim().toLowerCase() }).select('+password +tokenVersion');
     if (!user || !(await bcrypt.compare(password, user.password))) {
       return res.status(401).json({ success: false, message: 'Invalid email or password' });
     }
+    if (user.status === 'inactive') return res.status(401).json({ success: false, message: 'Account is inactive' });
     res.json({ success: true, message: 'Login successful', token: signToken(user), user: publicUser(user) });
   } catch (err) {
     next(err);

@@ -20,8 +20,9 @@ export async function authenticate(req, res, next) {
 
   try {
     // Always load the current database role; never trust a client-supplied role.
-    req.user = await User.findById(payload.sub);
+    req.user = await User.findById(payload.sub).select('+tokenVersion');
     if (!req.user) return res.status(401).json({ success: false, message: 'Account no longer exists' });
+    if (req.user.status === 'inactive' || (payload.ver || 0) !== (req.user.tokenVersion || 0)) return res.status(401).json({ success: false, message: 'Session is no longer valid. Please log in again.' });
     next();
   } catch (err) {
     next(err);

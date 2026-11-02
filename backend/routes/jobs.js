@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { recordActivity } from '../utils/activity.js';
 import mongoose from 'mongoose';
 import Job, { jobTypes, experienceLevels } from '../models/Job.js';
 import { authenticate, authorize } from '../middleware/auth.js';
@@ -69,7 +70,10 @@ router.get('/', async (req, res, next) => {
       filter.$or = [{ title: pattern }, { company: pattern }];
     }
     if (req.query.location?.trim()) filter.location = { $regex: escapeRegex(req.query.location.trim()), $options: 'i' };
-    if (req.query.jobType && req.query.jobType !== 'All Types') filter.jobType = normalizeType(req.query.jobType);
+    if (req.query.jobType && req.query.jobType !== 'All Types') {
+      if (!jobTypes.includes(normalizeType(req.query.jobType))) return res.status(400).json({ success: false, message: 'Invalid job type' });
+      filter.jobType = normalizeType(req.query.jobType);
+    }
     const jobs = await Job.find(filter).sort({ createdAt: -1, _id: -1 });
     res.json({ success: true, jobs: jobs.map(serialize) });
   } catch (error) { next(error); }
@@ -86,6 +90,7 @@ router.post('/', authorize('recruiter'), async (req, res, next) => {
   if (!data) return;
   try {
     const job = await Job.create({ ...data, recruiter: req.user._id });
+    await recordActivity(req.user, 'Job posted', 'Job', 'Job', job._id, job.title);
     res.status(201).json({ success: true, message: 'Job posted successfully', job: serialize(job) });
   } catch (error) { handleError(error, res, next); }
 });
@@ -110,6 +115,7 @@ router.put('/:jobId', authorize('recruiter'), async (req, res, next) => {
     if (!data) return;
     job.set(data);
     await job.save();
+    await recordActivity(req.user, 'Job updated', 'Job', 'Job', job._id, job.title);
     res.json({ success: true, message: 'Job updated successfully', job: serialize(job) });
   } catch (error) { handleError(error, res, next); }
 });
@@ -120,6 +126,7 @@ router.patch('/:jobId/status', authorize('recruiter'), async (req, res, next) =>
     if (!['active', 'closed'].includes(req.body?.status)) return res.status(400).json({ success: false, message: 'Status must be active or closed' });
     job.status = req.body.status;
     await job.save();
+    await recordActivity(req.user, 'Job updated', 'Job', 'Job', job._id, job.title);
     res.json({ success: true, message: 'Job status updated', job: serialize(job) });
   } catch (error) { handleError(error, res, next); }
 });
@@ -128,6 +135,7 @@ router.delete('/:jobId', authorize('recruiter'), async (req, res, next) => {
     const job = await findJob(req, res);
     if (!job || !owns(req, res, job)) return;
     await job.deleteOne();
+    await recordActivity(req.user, 'Job deleted', 'Job', 'Job', job._id, job.title);
     res.json({ success: true, message: 'Job deleted successfully' });
   } catch (error) { next(error); }
 });

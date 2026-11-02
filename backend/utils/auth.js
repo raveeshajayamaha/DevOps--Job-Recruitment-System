@@ -8,7 +8,7 @@ export function publicUser(user) {
 }
 
 export function signToken(user) {
-  return jwt.sign({}, process.env.JWT_SECRET, {
+  return jwt.sign({ ver: user.tokenVersion || 0 }, process.env.JWT_SECRET, {
     algorithm: 'HS256', subject: user.id, expiresIn: '1h',
     issuer: 'jobrecruit-api', audience: 'jobrecruit-frontend',
   });

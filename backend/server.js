@@ -1,8 +1,12 @@
-﻿import dotenv from 'dotenv';
+import dotenv from 'dotenv';
 import express from 'express';
 import cors from 'cors';
 import mongoose from 'mongoose';
 import { fileURLToPath } from 'node:url';
+import adminRoutes from './routes/admin.js';
+import profileRoutes from './routes/profile.js';
+import ActivityLog from './models/ActivityLog.js';
+import Resume from './models/Resume.js';
 import authRoutes from './routes/auth.js';
 import jobRoutes from './routes/jobs.js';
 import applicationRoutes from './routes/applications.js';
@@ -33,6 +37,8 @@ app.get('/api/test', (req, res) => {
 });
 
 app.use('/api/auth', authRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/profile', profileRoutes);
 app.use('/api/jobs', jobRoutes);
 app.use('/api/applications', applicationRoutes);
 app.use('/api/interviews', interviewRoutes);
@@ -48,7 +54,10 @@ app.use((err, req, res, next) => {
   if (err.type === 'entity.too.large') {
     return res.status(413).json({ success: false, message: 'Request body is too large' });
   }
-  console.error('Request failed:', err.message);
+  if (err.status && [400, 401, 403, 404, 409].includes(err.status)) return res.status(err.status).json({ success: false, message: err.message });
+  if (err.code === 11000) return res.status(409).json({ success: false, message: 'Record already exists' });
+  if (['ValidationError', 'CastError'].includes(err.name)) return res.status(400).json({ success: false, message: 'Invalid request data' });
+  console.error('Request failed:', err.name);
   res.status(500).json({ success: false, message: 'Internal server error' });
 });
 
@@ -61,6 +70,8 @@ async function startServer() {
   if (!process.env.JWT_SECRET || Buffer.byteLength(process.env.JWT_SECRET) < 32) throw new Error('JWT_SECRET must contain at least 32 bytes');
   await connectDB();
   await User.init();
+  await ActivityLog.init();
+  await Resume.init();
   await Application.init();
   await Interview.init();
   await InterviewRound.init();

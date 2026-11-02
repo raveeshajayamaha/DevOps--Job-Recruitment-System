@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { recordActivity } from '../utils/activity.js';
 import mongoose from 'mongoose';
 import Interview, { InterviewRound, interviewStatuses, interviewTypes, validDate, validTime, validLink } from '../models/Interview.js';
 import Application from '../models/Application.js';
@@ -69,6 +70,7 @@ router.post('/', authorize('recruiter'), async (req, res, next) => {
     if (!await User.exists({ _id: application.candidate, role: 'candidate' })) return res.status(404).json({ success: false, message: 'Candidate no longer available' });
     const sequence = await InterviewRound.findOneAndUpdate({ _id: application._id }, { $inc: { round: 1 } }, { upsert: true, returnDocument: 'after' });
     const interview = await Interview.create({ ...data, applicationId: application._id, jobId: job._id, candidateId: application.candidate, recruiterId: req.user._id, round: sequence.round });
+    await recordActivity(req.user, 'Interview scheduled', 'Interview', 'Interview', interview._id, job.title);
     const item = await populated(Interview.findById(interview._id));
     res.status(201).json({ success: true, interview: serialize(item) });
   } catch (error) { handleError(error, res, next); }
@@ -116,6 +118,7 @@ async function update(req, res, next, statusOnly) {
       Object.assign(item, data);
     }
     await item.save();
+    await recordActivity(req.user, 'Interview updated', 'Interview', 'Interview', item._id, item.status);
     res.json({ success: true, interview: serialize(item) });
   } catch (error) { handleError(error, res, next); }
 }

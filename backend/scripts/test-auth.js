@@ -5,6 +5,7 @@ import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
+import ActivityLog from '../models/ActivityLog.js';
 import { authorize } from '../middleware/auth.js';
 
 dotenv.config({ path: new URL('../.env', import.meta.url), quiet: true });
@@ -92,6 +93,10 @@ try {
   assert.equal(cors.headers.get('access-control-allow-origin'), 'http://localhost:5173'); checks++;
   console.log(`PASS: ${checks} authentication checks, including MongoDB persistence, bcrypt, JWT, database roles and concurrent duplicates.`);
 } finally {
+  if (mongoose.connection.readyState === 1) {
+    const testUsers = await User.find({ email: { $in: emails } }).select('_id');
+    await ActivityLog.deleteMany({ actor: { $in: testUsers.map(user => user._id) } });
+  }
   // Only remove the randomly named accounts created by this test run.
   if (mongoose.connection.readyState === 1) await User.deleteMany({ email: { $in: emails } });
   await mongoose.disconnect();

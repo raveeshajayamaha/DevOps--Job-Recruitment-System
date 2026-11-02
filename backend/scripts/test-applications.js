@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import Application from '../models/Application.js';
 import User from '../models/User.js';
+import ActivityLog from '../models/ActivityLog.js';
 import Job from '../models/Job.js';
 
 dotenv.config({ path: new URL('../.env', import.meta.url), quiet: true });
@@ -47,6 +48,7 @@ try {
   check((await call('/applications', { method: 'POST', token: candidate, body: { jobId: String(new mongoose.Types.ObjectId()) } })).status, 404);
   const attempts = await Promise.all([1, 2].map(() => call('/applications', { method: 'POST', token: candidate, body: { jobId, candidateId: userIds[1], recruiterId: userIds[3], status: 'shortlisted' } })));
   check(attempts.map(result => result.status).sort(), [201, 409]);
+  check((await Job.findById(jobId)).applicantsCount, 1, 'Duplicate race increments once');
   const application = attempts.find(result => result.status === 201).data.application;
   const id = application.id;
   check(application.candidateId, userIds[0]); check(application.status, 'pending');
@@ -102,6 +104,7 @@ try {
   await auth.login(emails[1], 'ApplicationTest!23456');
   const second = await service.createApplication(jobId);
   check(second.status, 'pending');
+  check((await Job.findById(jobId)).applicantsCount, 2);
   await assert.rejects(service.createApplication(jobId), error => error.status === 409); checks++;
   check((await call('/applications/' + second.id + '/status', { method: 'PATCH', token: recruiter, body: { status: 'rejected' } })).status, 200);
   check((await service.getApplicationById(second.id)).status, 'rejected');
@@ -113,12 +116,27 @@ try {
   storage.set('jobrecruit.token', 'invalid-token');
   await assert.rejects(service.getMyApplications(), error => error.status === 401); checks++;
   check(redirects.at(-1), '/login'); check(auth.getToken(), null);
+  check((await Job.findById(jobId)).applicantsCount, 2, 'Failed duplicate leaves counter unchanged');
+  const raceJob = await call('/jobs', { method: 'POST', token: recruiter, body: jobBody });
+  check(raceJob.status, 201);
+  const raceId = raceJob.data.job.id;
+  const distinct = await Promise.all([candidate, otherCandidate].map(token => call('/applications', { method: 'POST', token, body: { jobId: raceId, applicantsCount: 999 } })));
+  check(distinct.map(item => item.status), [201, 201]);
+  check((await Job.findById(raceId)).applicantsCount, 2, 'Distinct concurrent candidates increment atomically');
+  check(await Application.countDocuments({ job: raceId }), 2);
+  await call('/jobs/' + raceId + '/status', { method: 'PATCH', token: recruiter, body: { status: 'closed' } });
+  check((await call('/applications', { method: 'POST', token: candidate, body: { jobId: raceId } })).status, 400);
+  check((await Job.findById(raceId)).applicantsCount, 2);
   // Deleted jobs must not crash candidate history or accidentally grant recruiter access.
   await call('/jobs/' + jobId, { method: 'DELETE', token: recruiter });
   check((await call('/applications/' + id, { token: candidate })).data.application.jobTitle, 'Job no longer available');
   check((await call('/applications/' + id, { token: recruiter })).status, 403);
   console.log(`PASS: ${checks} application checks (MongoDB persistence, duplicate races, roles, ownership, statuses, invalid IDs, frontend service, network failure, and deleted jobs).`);
 } finally {
+  if (mongoose.connection.readyState === 1) {
+    const testUsers = await User.find({ email: { $in: emails } }).select('_id');
+    await ActivityLog.deleteMany({ actor: { $in: testUsers.map(user => user._id) } });
+  }
   if (mongoose.connection.readyState === 1) {
     await Application.deleteMany({ candidate: { $in: userIds } });
     await Job.deleteMany({ recruiter: { $in: userIds } });

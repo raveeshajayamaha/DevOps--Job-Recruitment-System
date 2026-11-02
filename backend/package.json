@@ -9,7 +9,10 @@
     "test:auth": "node scripts/test-auth.js",
     "test:jobs": "node scripts/test-jobs.js",
     "test:applications": "node scripts/test-applications.js",
-    "test:interviews": "node scripts/test-interviews.js"
+    "test:interviews": "node scripts/test-interviews.js",
+    "test:admin": "node scripts/test-admin.js",
+    "test:profile": "node scripts/test-profile.js",
+    "test": "npm run test:auth && npm run test:jobs && npm run test:applications && npm run test:interviews && npm run test:admin && npm run test:profile"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",

@@ -7,6 +7,7 @@ import Interview, { InterviewRound } from '../models/Interview.js';
 import Application from '../models/Application.js';
 import Job from '../models/Job.js';
 import User from '../models/User.js';
+import ActivityLog from '../models/ActivityLog.js';
 
 dotenv.config({ path: new URL('../.env', import.meta.url), quiet: true });
 const base = process.env.INTERVIEW_TEST_URL || 'http://localhost:5000/api';
@@ -140,6 +141,10 @@ try {
   check((await call('/interviews/' + id + '/status', { method: 'PATCH', token: recruiter, body: { status: 'cancelled' } })).status, 403);
   console.log('PASS: ' + checks + ' interview checks (MongoDB, roles, ownership, validation, concurrent rounds, persistence, frontend services, and errors).');
 } finally {
+  if (mongoose.connection.readyState === 1) {
+    const testUsers = await User.find({ email: { $in: emails } }).select('_id');
+    await ActivityLog.deleteMany({ actor: { $in: testUsers.map(user => user._id) } });
+  }
   if (mongoose.connection.readyState === 1) {
     await Interview.deleteMany({ candidateId: { $in: userIds } });
     await InterviewRound.deleteMany({ _id: { $in: applicationIds } });
