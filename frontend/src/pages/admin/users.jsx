@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import adminUsers from "../../data/adminUsers";
 import AdminSidebar from "./AdminSidebar";
-import { useAdminTheme } from "./AdminThemeContext";
+import { useAdminTheme } from "./useAdminTheme";
 import "./dashboard.css";
 import "./users.css";
 

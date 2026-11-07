@@ -29,7 +29,7 @@ function Register() {
     }, 5000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [backgrounds.length]);
 
   const handleRegister = (e) => {
     e.preventDefault();

@@ -55,7 +55,7 @@ function Login() {
     // Clear interval when component is removed
     return () => clearInterval(interval);
 
-  }, []);
+  }, [backgrounds.length]);
 
 
   // ==============================
