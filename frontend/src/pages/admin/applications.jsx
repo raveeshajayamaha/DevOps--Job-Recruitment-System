@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import sampleApplications from "../../data/recruiterApplications";
 import AdminSidebar from "./AdminSidebar";
-import { useAdminTheme } from "./AdminThemeContext";
+import { useAdminTheme } from "./useAdminTheme";
 import "./dashboard.css";
 import "./applications.css";
 

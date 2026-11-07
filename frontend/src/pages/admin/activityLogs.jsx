@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import AdminSidebar from "./AdminSidebar";
-import { useAdminTheme } from "./AdminThemeContext";
+import { useAdminTheme } from "./useAdminTheme";
 import "./dashboard.css";
 import "./activityLogs.css";
 

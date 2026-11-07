@@ -36,7 +36,7 @@ import AdminJobs from "./pages/admin/jobs";
 import AdminApplications from "./pages/admin/applications";
 import AdminActivityLogs from "./pages/admin/activityLogs";
 import AdminSettings from "./pages/admin/settings";
-import { AdminThemeProvider } from "./pages/admin/AdminThemeContext";
+import { AdminThemeProvider } from "./pages/admin/AdminThemeProvider";
 
 function App(){
 

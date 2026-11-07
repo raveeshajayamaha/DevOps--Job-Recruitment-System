@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import sampleJobs from "../../data/recruiterJobs";
 import AdminSidebar from "./AdminSidebar";
-import { useAdminTheme } from "./AdminThemeContext";
+import { useAdminTheme } from "./useAdminTheme";
 import "./dashboard.css";
 import "./jobs.css";
 
