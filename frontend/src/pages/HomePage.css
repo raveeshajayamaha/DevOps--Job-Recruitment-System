@@ -1,0 +1,400 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+
+.home-page{
+
+    min-height:100vh;
+
+    background-image:
+    url("/images/job-bg.png");
+
+    background-size:cover;
+
+    background-position:center;
+
+    font-family:Arial, sans-serif;
+
+}
+
+
+
+
+
+/* Navbar: scoped to Home so other page headers keep their own styles. */
+.home-page .navbar {
+    min-height: 84px;
+    padding: 18px clamp(24px, 4vw, 70px);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px 24px;
+    background: #fff;
+    border-bottom: 1px solid #e4e7ec;
+}
+
+.home-page .navbar .logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+    color: #14213d;
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 1.2;
+    white-space: nowrap;
+}
+
+.home-page .navbar .nav-links,
+.home-page .navbar .buttons {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.home-page .navbar .nav-links a,
+.home-page .navbar .buttons button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 0 12px;
+    border: 1px solid transparent;
+    border-radius: 7px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.25;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.home-page .navbar .nav-links a {
+    position: relative;
+    color: #475467;
+}
+
+.home-page .navbar .nav-links a.active {
+    color: #1465e8;
+}
+
+.home-page .navbar .nav-links a.active::after {
+    content: '';
+    position: absolute;
+    right: 12px;
+    bottom: 1px;
+    left: 12px;
+    height: 2px;
+    border-radius: 2px;
+    background: #1465e8;
+}
+
+.home-page .navbar .buttons button {
+    background: transparent;
+    color: #475467;
+}
+
+.home-page .navbar .buttons .login-btn {
+    border-color: #1465e8;
+    color: #1465e8;
+}
+
+.home-page .navbar .buttons .register-btn {
+    padding-inline: 18px;
+    border-color: #1465e8;
+    background: #1465e8;
+    color: #fff;
+}
+
+.home-page .navbar .nav-links a:hover {
+    background: #f8fafc;
+    color: #1465e8;
+}
+
+.home-page .navbar .buttons .login-btn:hover {
+    border-color: #1465e8;
+    background: #eff6ff;
+    color: #1465e8;
+}
+
+.home-page .navbar .buttons .register-btn:hover {
+    border-color: #1054c4;
+    background: #1054c4;
+}
+
+.home-page .navbar a:focus-visible,
+.home-page .navbar button:focus-visible {
+    outline: 2px solid #1465e8;
+    outline-offset: 3px;
+}
+
+@media (max-width: 1200px) {
+    .home-page .navbar .nav-links {
+        order: 1;
+        flex-basis: 100%;
+        justify-content: flex-start;
+        overflow-x: auto;
+    }
+}
+
+@media (max-width: 700px) {
+    .home-page .navbar {
+        padding: 16px;
+        justify-content: center;
+        gap: 12px;
+    }
+
+    .home-page .navbar .logo {
+        justify-content: center;
+        flex-basis: 100%;
+    }
+
+    .home-page .navbar .nav-links {
+        order: 0;
+        gap: 4px;
+    }
+
+    .home-page .navbar .nav-links a {
+        padding-inline: 8px;
+    }
+
+    .home-page .navbar .buttons {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        width: 100%;
+        max-width: 440px;
+        margin-left: auto;
+        padding-top: 12px;
+        border-top: 1px solid #e4e7ec;
+    }
+}
+
+/* Hero */
+
+
+.hero{
+
+    height:620px;
+
+    display:flex;
+
+    align-items:center;
+
+    padding-left:90px;
+
+
+    background:
+    linear-gradient(
+    90deg,
+    rgba(255,255,255,0.85),
+    rgba(255,255,255,0.1)
+    );
+
+}
+
+
+
+.hero-content{
+
+    width:650px;
+
+}
+
+
+
+.line{
+
+    width:60px;
+
+    height:3px;
+
+    background:#1465e8;
+
+}
+
+
+
+.small-text{
+
+    margin-top:20px;
+
+    letter-spacing:5px;
+
+    color:#52657a;
+
+}
+
+
+
+h1{
+
+    margin-top:25px;
+
+    font-size:75px;
+
+    line-height:1.05;
+
+    color:#071525;
+
+}
+
+
+
+h1 span{
+
+    color:#1465e8;
+
+}
+
+
+
+.description{
+
+    font-size:22px;
+
+    color:#40566f;
+
+    margin-top:25px;
+
+}
+
+
+
+
+
+/* Search */
+
+
+.search-box{
+
+    margin-top:35px;
+
+    background:white;
+
+    width:730px;
+
+    height:75px;
+
+    border-radius:40px;
+
+    display:flex;
+
+    align-items:center;
+
+    padding:10px;
+
+    box-shadow:0 10px 30px rgba(0,0,0,.15);
+
+}
+
+
+
+.search-item{
+
+    flex:1;
+
+    padding-left:20px;
+
+    font-size:17px;
+
+    color:#667085;
+
+}
+
+
+
+.divider{
+
+    height:40px;
+
+    width:1px;
+
+    background:#ddd;
+
+}
+
+
+
+.search-box button{
+
+    height:55px;
+
+    width:160px;
+
+    border-radius:30px;
+
+    background:#1465e8;
+
+    color:white;
+
+    border:none;
+
+    font-size:18px;
+
+}
+
+
+
+
+
+/* Cards */
+
+
+.cards{
+
+    display:flex;
+
+    justify-content:center;
+
+    gap:25px;
+
+    margin-top:-70px;
+
+    position:relative;
+
+}
+
+
+
+.card{
+
+    width:300px;
+
+    height:150px;
+
+    background:white;
+
+    border-radius:20px;
+
+    padding:25px;
+
+    box-shadow:0 10px 30px rgba(0,0,0,.15);
+
+}
+
+
+
+.card h3{
+
+    font-size:20px;
+
+    color:#14213d;
+
+}
+
+
+
+.card p{
+
+    margin-top:15px;
+
+    color:#667085;
+
+    line-height:1.5;
+
+}

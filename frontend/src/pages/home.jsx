@@ -1,5 +1,5 @@
-import { useNavigate } from "react-router-dom";
-import "./Home.css";
+import { Link, useNavigate } from "react-router-dom";
+import "./HomePage.css";
 
 
 function Home(){
@@ -25,23 +25,11 @@ function Home(){
     <a href="#jobs">Jobs</a>
     <a href="#companies">Companies</a>
     <a href="#contact">Contact</a>
+    <Link to="/dashboard">Dashboard</Link>
+    <Link to="/admin/login">Admin Portal</Link>
   </div>
 
   <div className="buttons">
-    <button
-      className="dashboard-btn"
-      onClick={() => navigate("/dashboard")}
-    >
-      Dashboard
-    </button>
-
-    <button
-      className="admin-portal-link"
-      onClick={() => navigate("/admin/login")}
-    >
-      Admin Portal
-    </button>
-
     <button
       className="login-btn"
       onClick={() => navigate("/login")}
