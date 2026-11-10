@@ -1,0 +1,37 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    image: job-recruitment-backend:1.0
+    container_name: job-recruitment-backend
+    restart: unless-stopped
+    environment:
+      PORT: "5000"
+      MONGODB_URI: ${MONGODB_URI}
+      FRONTEND_URL: "http://localhost:8081"
+      JWT_SECRET: ${JWT_SECRET}
+    ports:
+      - "5000:5000"
+    networks:
+      - job-recruitment-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: /api
+    image: job-recruitment-frontend:2.0
+    container_name: job-recruitment-frontend-v2
+    restart: unless-stopped
+    ports:
+      - "8081:80"
+    depends_on:
+      - backend
+    networks:
+      - job-recruitment-network
+
+networks:
+  job-recruitment-network:
+    external: true
