@@ -5,6 +5,13 @@ export function getToken() {
   return sessionStorage.getItem(TOKEN_KEY);
 }
 
+export function setToken(token) {
+  if (typeof token !== 'string' || !token.trim()) {
+    throw new Error('The server returned an incomplete account response. Please try again.');
+  }
+  sessionStorage.setItem(TOKEN_KEY, token);
+}
+
 export function logout(event) {
   sessionStorage.removeItem(TOKEN_KEY);
   // Existing Logout links pass their click event. Keep their UI unchanged.
@@ -60,7 +67,7 @@ export async function login(email, password) {
       !['candidate', 'recruiter', 'admin'].includes(data.user.role)) {
     throw new Error('The server returned an incomplete login response. Please try again.');
   }
-  sessionStorage.setItem(TOKEN_KEY, data.token);
+  setToken(data.token);
   return data.user;
 }
 

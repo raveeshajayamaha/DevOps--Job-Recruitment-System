@@ -52,7 +52,9 @@ export async function browserService(name, token) {
   const read = async file => (await readFile(new URL('../../frontend/src/services/' + file + '.js', import.meta.url), 'utf8')).replace('import.meta.env.VITE_API_URL', JSON.stringify(base));
   const authUrl = dataUrl(await read('authService'));
   const apiUrl = dataUrl((await read('apiClient')).replace("'./authService'", JSON.stringify(authUrl)));
-  const source = (await read(name)).replace("'./apiClient'", JSON.stringify(apiUrl));
+  const source = (await read(name))
+  .replaceAll("'./apiClient'", JSON.stringify(apiUrl))
+  .replaceAll("'./authService'", JSON.stringify(authUrl));
   const storage = new Map([['jobrecruit.token', token]]);
   globalThis.sessionStorage = { getItem: key => storage.get(key) ?? null, setItem: (key, value) => storage.set(key, value), removeItem: key => storage.delete(key) };
   globalThis.window = { location: { assign() {} } };

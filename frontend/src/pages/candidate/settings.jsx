@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import CandidateLayout from "./candidateLayout";
+import { getSettings, updateSettings } from "../../services/profileService";
 
 function Settings() {
   const [email, setEmail] = useState("alex.perera@example.com");
@@ -15,22 +16,59 @@ function Settings() {
   });
   const [modalErrors, setModalErrors] = useState({});
   const [accountMessage, setAccountMessage] = useState("");
-  const [notifications, setNotifications] = useState({
-    recommendations: true,
-    applications: true,
-    interviews: true,
-  });
-  const [visibility, setVisibility] = useState("Public");
+  const [preferences, setPreferences] = useState(null);
+  const [settingsError, setSettingsError] = useState("");
+  const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [loadAttempt, setLoadAttempt] = useState(0);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    getSettings(controller.signal)
+      .then((settings) => {
+        setPreferences({
+          recommendations: settings.recommendations,
+          applications: settings.applications,
+          interviews: settings.interviews,
+          visibility: settings.visibility,
+        });
+        setSettingsError("");
+      })
+      .catch((error) => {
+        if (error.name !== "AbortError") setSettingsError(error.message);
+      });
+
+    return () => controller.abort();
+  }, [loadAttempt]);
 
   const toggleNotification = (name) => {
     setSaved(false);
-    setNotifications({ ...notifications, [name]: !notifications[name] });
+    setSettingsError("");
+    setPreferences((current) => ({ ...current, [name]: !current[name] }));
   };
 
-  const handleSave = (event) => {
+  const handleSave = async (event) => {
     event.preventDefault();
-    setSaved(true);
+    if (!preferences || saving) return;
+
+    setSaving(true);
+    setSaved(false);
+    setSettingsError("");
+    try {
+      const updated = await updateSettings(preferences);
+      setPreferences({
+        recommendations: updated.recommendations,
+        applications: updated.applications,
+        interviews: updated.interviews,
+        visibility: updated.visibility,
+      });
+      setSaved(true);
+    } catch (error) {
+      setSettingsError(error.message);
+    } finally {
+      setSaving(false);
+    }
   };
 
   const openModal = (modal) => {
@@ -109,7 +147,7 @@ function Settings() {
 
   return (
     <CandidateLayout title="Settings" eyebrow="Account preferences">
-      <form className="settings-grid" onSubmit={handleSave}>
+      <form className="settings-grid" onSubmit={handleSave} aria-busy={saving}>
         <section className="candidate-card settings-section">
           <div className="candidate-card-heading"><div><h2>Account settings</h2><p>Manage the details you use to access your account.</p></div></div>
           <div className="settings-account-row"><div><span className="settings-label">Email address</span><strong>{email}</strong></div><button type="button" className="secondary-action" onPointerDown={() => openModal("email")} onClick={() => openModal("email")}>Change email</button></div>
@@ -118,14 +156,16 @@ function Settings() {
 
         <section className="candidate-card settings-section">
           <div className="candidate-card-heading"><div><h2>Notification settings</h2><p>Choose which updates you would like to receive.</p></div></div>
-          <SettingToggle label="Job recommendations" description="Receive opportunities based on your profile." checked={notifications.recommendations} onChange={() => toggleNotification("recommendations")} />
-          <SettingToggle label="Application updates" description="Get notified when an application status changes." checked={notifications.applications} onChange={() => toggleNotification("applications")} />
-          <SettingToggle label="Interview notifications" description="Receive reminders about upcoming interviews." checked={notifications.interviews} onChange={() => toggleNotification("interviews")} />
+          {!preferences ? (settingsError ? <p role="alert">Could not load settings: {settingsError} <button type="button" className="secondary-action" onClick={() => { setSettingsError(""); setLoadAttempt((attempt) => attempt + 1); }}>Retry</button></p> : <p role="status">Loading settings...</p>) : <>
+            <SettingToggle label="Job recommendations" description="Receive opportunities based on your profile." checked={preferences.recommendations} disabled={saving} onChange={() => toggleNotification("recommendations")} />
+            <SettingToggle label="Application updates" description="Get notified when an application status changes." checked={preferences.applications} disabled={saving} onChange={() => toggleNotification("applications")} />
+            <SettingToggle label="Interview notifications" description="Receive reminders about upcoming interviews." checked={preferences.interviews} disabled={saving} onChange={() => toggleNotification("interviews")} />
+          </>}
         </section>
 
         <section className="candidate-card settings-section">
           <div className="candidate-card-heading"><div><h2>Privacy settings</h2><p>Control how recruiters can discover your profile.</p></div></div>
-          <label className="visibility-label">Profile visibility<select value={visibility} onChange={(event) => { setSaved(false); setVisibility(event.target.value); }}><option>Public</option><option>Recruiters only</option><option>Private</option></select></label>
+          {preferences && <label className="visibility-label">Profile visibility<select disabled={saving} value={preferences.visibility} onChange={(event) => { setSaved(false); setSettingsError(""); setPreferences((current) => ({ ...current, visibility: event.target.value })); }}><option>Public</option><option>Recruiters only</option><option>Private</option></select></label>}
         </section>
 
         <section className="candidate-card settings-section account-actions">
@@ -135,8 +175,10 @@ function Settings() {
         </section>
 
         <div className="settings-form-actions">
+          {settingsError && preferences && <span role="alert">Could not save settings: {settingsError}</span>}
           {saved && <span className="save-message" role="status">Settings saved successfully.</span>}
-          <button type="submit" className="primary-action">Save Settings</button>
+          {saving && <span role="status">Saving settings...</span>}
+          <button type="submit" className="primary-action" disabled={!preferences || saving}>Save Settings</button>
         </div>
       </form>
       {accountMessage && <p className="account-success-message" role="status">{accountMessage}</p>}
@@ -271,11 +313,11 @@ function ModalField({ label, type, value, error, onChange }) {
   );
 }
 
-function SettingToggle({ label, description, checked, onChange }) {
+function SettingToggle({ label, description, checked, disabled, onChange }) {
   return (
     <label className="setting-toggle">
       <span><strong>{label}</strong><small>{description}</small></span>
-      <input type="checkbox" checked={checked} onChange={onChange} />
+      <input type="checkbox" checked={checked} disabled={disabled} onChange={onChange} />
       <span className="toggle-track" aria-hidden="true"><span /></span>
     </label>
   );
